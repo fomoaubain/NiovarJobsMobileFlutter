@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/downloads_path_provider_28/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/downloads_path_provider_28/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/downloads_path_provider_28/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/downloads_path_provider_28/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/downloads_path_provider_28/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/downloads_path_provider_28/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/file_picker/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/file_picker/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/file_picker/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/file_picker/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/file_picker/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/file_picker/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/fluttertoast/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/fluttertoast/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/fluttertoast/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/fluttertoast/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/fluttertoast/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/fluttertoast/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber_plugin/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber_plugin/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber_plugin/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber_plugin/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber_plugin/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/libphonenumber_plugin/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/open_file/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/open_file/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/open_file/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/open_file/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/open_file/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/open_file/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/path_provider/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/path_provider/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/path_provider/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/path_provider/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/path_provider/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/path_provider/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/permission_handler/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/permission_handler/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/permission_handler/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/permission_handler/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/permission_handler/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/permission_handler/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/shared_preferences/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/shared_preferences/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/shared_preferences/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/shared_preferences/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/shared_preferences/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/shared_preferences/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/sqflite/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/sqflite/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/sqflite/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/sqflite/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/sqflite/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/sqflite/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/video_player/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/video_player/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/video_player/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/video_player/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/video_player/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/video_player/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/wakelock/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/wakelock/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/wakelock/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/wakelock/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/wakelock/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/wakelock/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/webview_flutter/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/webview_flutter/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/webview_flutter/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/webview_flutter/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/webview_flutter/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/.symlinks/plugins/webview_flutter/example/build" />
+    </content>
+    <orderEntry type="jdk" jdkName="Android API 30 Platform" jdkType="Android SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Dart SDK" level="project" />
+    <orderEntry type="library" name="Flutter Plugins" level="project" />
+    <orderEntry type="library" name="Dart Packages" level="project" />
+  </component>
+</module>
