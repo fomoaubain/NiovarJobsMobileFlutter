@@ -158,7 +158,7 @@ class _AddDocument extends State<AddDocument> {
                             imageCheck ?
                             Constante.TextwithIcon(Icons.check_circle_outline, _fileName, Colors.green, 12) :
                             Text(
-                              "Selectionner votre Cv" ,
+                              "Cliquer ici pour sélectionner" ,
                               style: Constante.style6,
                             ),
                           ],

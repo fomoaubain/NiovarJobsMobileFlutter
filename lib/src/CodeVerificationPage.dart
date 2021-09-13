@@ -10,11 +10,13 @@ import 'package:flutter/material.dart';
 
 import '../Constante.dart';
 import '../Global.dart';
+import 'LoginPage.dart';
 
 class CodeVerificationPage extends StatefulWidget {
   late  String email;
   late  String code;
-  CodeVerificationPage(this.email, this.code);
+  late bool ispasswordforget;
+  CodeVerificationPage(this.email, this.code, this.ispasswordforget);
   @override
   _CodeVerificationPage createState() => _CodeVerificationPage();
 }
@@ -34,7 +36,21 @@ class _CodeVerificationPage extends State<CodeVerificationPage> {
 
   Future VerifyEmail( String email) async{
     Dio dio = new Dio();
-    final String pathUrl = Constante.serveurAdress+"RestUser/ForgotPassword";
+    String pathUrl ="";
+    if(widget.ispasswordforget) {
+      pathUrl = Constante.serveurAdress+"RestUser/ForgotPassword";
+    }else{
+      pathUrl = Constante.serveurAdress+"RestUser/sendCode";
+    }
+    var response = await dio.get(pathUrl,
+        queryParameters: {'email': email}
+    );
+    return response.data;
+  }
+
+  Future confirmCompte( String email) async{
+    Dio dio = new Dio();
+    String  pathUrl = Constante.serveurAdress+"RestUser/Confirm";
     var response = await dio.get(pathUrl,
         queryParameters: {'email': email}
     );
@@ -212,7 +228,7 @@ class _CodeVerificationPage extends State<CodeVerificationPage> {
                   ),
                   TextButton(
                       onPressed: () async {
-                        Constante.showAlert(context, "Veuillez patientez", "Envoie du code en cour...", SizedBox(), 100);
+                        Constante.showAlert(context, "Veuillez patientez", "Envoie du courriel en cour en cour...", SizedBox(), 100);
                         await VerifyEmail(widget.email.toString()).then((value){
                           if(value['result_code'].toString().contains("1")){
                             Navigator.pop(context);
@@ -261,7 +277,7 @@ class _CodeVerificationPage extends State<CodeVerificationPage> {
                 child: ButtonTheme(
                   height: 50,
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       formKey.currentState!.validate();
                       // conditions for validating
                       if (currentText.length != 6 || currentText != widget.code.toString()) {
@@ -274,9 +290,39 @@ class _CodeVerificationPage extends State<CodeVerificationPage> {
                             hasError = false;
                           },
                         );
-                        Navigator.pop(context);
-                        Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => PasswordForget(widget.email)));
+                        if(widget.ispasswordforget){
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context, MaterialPageRoute(builder: (context) => PasswordForget(widget.email)));
+                        }else{
+                          Constante.showAlert(context, "Veuillez patientez", "Vérification en cour...", SizedBox(), 100);
+                          await confirmCompte(widget.email.toString()).then((value){
+                            if(value['result_code'].toString().contains("1")){
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) => LoginPage()));
+                            }else{
+                              Navigator.pop(context);
+                              Constante.showAlert(context, "Note d'information", value['message'].toString(),
+                                  SizedBox(
+                                    child: RaisedButton(
+                                      padding: EdgeInsets.all(10),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "Fermer",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      color:Colors.orange,
+                                    ),
+                                  ),
+                                  170);
+                            }
+                          }
+                          );
+                        }
                       }
                     },
                     child: Center(

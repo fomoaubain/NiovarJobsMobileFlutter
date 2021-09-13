@@ -6,6 +6,7 @@ import 'package:niovarjobs/model/Job.dart';
 
 import 'package:niovarjobs/model/Postuler.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:niovarjobs/src/CodeVerificationPage.dart';
 import 'package:niovarjobs/src/LoginPage.dart';
 
 
@@ -266,25 +267,11 @@ class _form_candidat extends State<form_candidat> {
                                 if(formKey.currentState!.validate()){
                                   Constante.showAlert(context, "Veuillez patientez", "Creation de votre compte en cour...", SizedBox(), 100);
                                   await CreateCompte(name, email, telephone, pwd.text, Constante.typeCandidat).then((value){
-                                    print(value);
                                     if(value['result_code'].toString()=="1"){
+                                      String code=value['code'].toString();
                                       Navigator.pop(context);
-                                      Constante.showAlert(context, "Note d'information", "Merci d'avoir creer votre compte. Un message de confirmation a ete envoyer a cette adresse mail : "+ email,
-                                          SizedBox(
-                                            child: RaisedButton(
-                                              padding: EdgeInsets.all(10),
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context, MaterialPageRoute(builder: (context) => LoginPage()));
-                                              },
-                                              child: Text(
-                                                "Cliquer ici pour continuer",
-                                                style: TextStyle(color: Colors.white),
-                                              ),
-                                              color:Colors.orange,
-                                            ),
-                                          ),
-                                          170);
+                                      Navigator.push(
+                                          context, MaterialPageRoute(builder: (context) => CodeVerificationPage(email, code, false)));
                                     }else{
                                       Navigator.pop(context);
                                       Constante.showAlert(context, "Alerte !", value['message'].toString(),

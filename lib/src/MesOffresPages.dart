@@ -1,65 +1,57 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:niovarjobs/Constante.dart';
-import 'package:niovarjobs/model/Postuler.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:niovarjobs/Constante.dart';
-import 'package:niovarjobs/model/Inscrire.dart';
-import 'package:niovarjobs/model/Job.dart';
-import 'package:niovarjobs/model/Postuler.dart';
-import 'package:niovarjobs/src/AbonnementPage.dart';
-import 'package:niovarjobs/src/DetailsJob.dart';
-import 'package:niovarjobs/src/ListJob.dart';
-import 'package:niovarjobs/src/PageCompagny.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:niovarjobs/widget/company_card.dart';
-import 'package:niovarjobs/widget/company_card2.dart';
+import 'package:niovarjobs/model/Pages.dart';
+import 'package:niovarjobs/model/Postuler.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter/material.dart';
 
-import 'drawer/drawer_header.dart';
+import '../Constante.dart';
+import 'DetailsJob.dart';
 import 'package:http/http.dart' as http;
-import 'package:niovarjobs/Global.dart' as session;
 
-class ListJob extends StatefulWidget {
-
+class MesOffresPages extends StatefulWidget {
+  late var idIns;
+  MesOffresPages(this.idIns);
   @override
-  _ListJob createState() => _ListJob();
+  _MesOffresPages createState() => _MesOffresPages();
 }
 
-class _ListJob extends State<ListJob> {
+class _MesOffresPages extends State<MesOffresPages> {
   ScrollController _scrollController = new ScrollController();
   late List<Postuler> objJob=[],  initListJob=[];
   late Future<List<Postuler>>  listOffreRecent;
   var loading = false;
 
-  Future<List<Postuler>> fetchItem(String urlApi) async {
+  Future<List<Postuler>> fetchItem(String id) async {
     List<Postuler> listModel = [];
-    final response = await http.get(Uri.parse(Constante.serveurAdress+urlApi));
+    final response = await http.get(Uri.parse(Constante.serveurAdress+"RestPage/MyPageOffre/"+id.toString()));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['datas'];
+
       if (data != null) {
         data.forEach((element) {
           listModel.add(Postuler.fromJson(element));
         });
       }
     }
-
-
-      initListJob=  listModel;
+    initListJob=  listModel;
 
     return listModel.take(8).toList();
   }
 
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    listOffreRecent= this.fetchItem('RestJob/listoffrerecent?token='+Constante.token);
+    listOffreRecent= this.fetchItem(widget.idIns.toString());
     _scrollController.addListener(_onScroll);
   }
-
   _onScroll(){
     if (_scrollController.offset >=
         _scrollController.position.maxScrollExtent &&
@@ -81,32 +73,8 @@ class _ListJob extends State<ListJob> {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _scrollController.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Constante.kSilver,
-      appBar: AppBar(
-        backgroundColor: Constante.kSilver,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Constante.kBlack,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          "Toutes les offres",
-          style: Constante.kTitleStyle,
-        ),
-        centerTitle: true,
-      ),
       body: Container(
         child:FutureBuilder<List<Postuler>>(
           future: listOffreRecent,
@@ -116,12 +84,12 @@ class _ListJob extends State<ListJob> {
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => ListJob()))
+                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
               );
             }
             if(initListJob.length==0) {
               return Center(
-                  child: Constante.layoutDataNotFound("Aucume offre d'emploi disponible")
+                  child: Text("Aucune offre d'emploi disponible", style: TextStyle(color: Colors.orange, fontSize: 16.0))
               );
             }
             if(snapshot.hasData) {
@@ -159,11 +127,9 @@ class _ListJob extends State<ListJob> {
           },
         ),
       ),
-
     );
+
   }
-
-
   ListTile makeListTile(Postuler postuler) => ListTile(
     contentPadding:
     EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -258,3 +224,5 @@ class _ListJob extends State<ListJob> {
     },
   );
 }
+
+

@@ -5,6 +5,7 @@ import 'package:niovarjobs/Global.dart' as session;
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/src/profil.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,7 @@ class Dashbord extends StatefulWidget {
 }
 
 class _Dashbord extends State<Dashbord> {
-
+  Future<void>? _launched;
   @override
   void initState() {
     super.initState();
@@ -41,7 +42,7 @@ class _Dashbord extends State<Dashbord> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Mon panel",
+          "Mon tableau de bord",
           style: Constante.kTitleStyle,
         ),
         centerTitle: true,
@@ -61,20 +62,27 @@ class _Dashbord extends State<Dashbord> {
                     Row(
                       children: [
                         profilLogin(),
-                        Text.rich(
-                          TextSpan(
-                            style: GoogleFonts.questrial(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xF8F6894D),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => Profil()));
+                          },
+                          child: Text.rich(
+                            TextSpan(
+                              style: GoogleFonts.questrial(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xF8F6894D),
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: "  " + session.email,
+                                )
+                              ],
                             ),
-                            children: [
-                              TextSpan(
-                                text: "  " + session.login,
-                              )
-                            ],
                           ),
-                        ),
+                        )
+                        ,
                       ],
                     ),
                     SizedBox(height: 4),
@@ -86,7 +94,9 @@ class _Dashbord extends State<Dashbord> {
           ),
           SizedBox(height: 20),
           //TODO Grid Dashboard
-          GridDashboard(),
+          session.type.toString()=="client" ? layoutForWebSite() :  GridDashboard(),
+
+
         ],
       ),
 
@@ -126,6 +136,100 @@ class _Dashbord extends State<Dashbord> {
     );
 
 
+  }
+
+  Widget layoutForWebSite(){
+    return Container(
+      margin: EdgeInsets.all(30),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.orange.withOpacity(.5)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(height: 15),
+          Container(
+            margin: EdgeInsets.all(5),
+            alignment: Alignment.topCenter,
+            child: Text(
+              "Note d'information",
+              style: GoogleFonts.openSans(
+                textStyle: TextStyle(
+                  color: Colors.green,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 5),
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child:
+            Text(
+              "Afin de béneficier de tous les services et fonctionnalitées et un meilleur management de votre compte employeur/client que vous offres NiovarJobs, "
+                  "veuillez cliquer sur le  lien ci-dessous afin de vous connectez sur la notre plateforme et accéder a toutes les options qui vous sont offertes.",
+              style: GoogleFonts.openSans(
+                textStyle: TextStyle(
+                  color: Colors.black45,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+
+          SizedBox(height: 10),
+
+          Card(
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              color: Colors.orange,
+              child: InkWell( onTap: () async {
+                _launched = _launchInBrowser("https://niovarjobs.com/Inscrires/Login");
+              },
+                child: Container(
+                  height: 50,
+                  width:300,
+                  child: Center(
+                      child: Text(
+                        "Continuer sur NiovarJobs.com",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18,
+                            color: Colors.white
+                        ),
+                      ),
+                  ),
+                ),
+                borderRadius: BorderRadius.circular(10),
+              )
+          ),
+          SizedBox(height: 15),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _launchInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: true,
+        headers: <String, String>{'my_header_key': 'my_header_value'},
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
 

@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/model/Postuler.dart';
+import 'package:niovarjobs/src/homePage.dart';
 
 import 'model/Job.dart';
  class Constante
 {
- // static String  serveurAdress = "https://www.niovarjobs.com/";
-  static String  serveurAdress = "http://192.168.43.63:3000/";
-// static String  serveurAdress = "http://192.168.0.102:3000/";
+  //static String  serveurAdress = "https://www.niovarjobs.com/";
+  //static String  serveurAdress = "http://192.168.43.63:3000/";
+ static String  serveurAdress = "http://192.168.0.103:3000/";
 
  static String  token = "LYo32?Z";
  static String  typeClient = "client";
@@ -375,5 +376,108 @@ static  void showToastMessage(String message){
     );
 
   }
+
+ static  Widget layoutNotInternet( BuildContext context, Route route){
+   return Container(
+     width: 300,
+     child: Column(
+       mainAxisAlignment: MainAxisAlignment.center,
+       children: <Widget>[
+         SizedBox(height: 15),
+         Container(
+           margin: EdgeInsets.all(5),
+           alignment: Alignment.topCenter,
+           child: Text(
+             "Aucune connexion internet ! ",
+             style: GoogleFonts.openSans(
+               textStyle: TextStyle(
+                 color: Colors.black45,
+                 fontSize: 18,
+                 fontWeight: FontWeight.w600,
+               ),
+             ),
+           ),
+         ),
+
+         SizedBox(height: 5),
+         Container(
+           alignment: Alignment.center,
+           padding: EdgeInsets.symmetric(horizontal: 10),
+           child:
+           Text(
+             "Aucune connexion internet disponible ! Vérifier votre point d'accès ou réessayer.",
+             style: GoogleFonts.openSans(
+               textStyle: TextStyle(
+                 color: Colors.black45,
+                 fontSize: 10,
+                 fontWeight: FontWeight.w600,
+               ),
+             ),
+             textAlign: TextAlign.center,
+           ),
+         ),
+
+
+         SizedBox(height: 10),
+
+         Card(
+             elevation: 10,
+             shape: RoundedRectangleBorder(
+               borderRadius: BorderRadius.circular(15),
+             ),
+             color: Colors.orange,
+             child: InkWell( onTap: ()  {
+               Navigator.pop(context);
+               Navigator.push(context, route);
+             },
+               child: Container(
+                 height: 50,
+                 width:200,
+                 child: Center(
+                   child: Text(
+                     "Réessayer",
+                     style: TextStyle(
+                         fontWeight: FontWeight.w500,
+                         fontSize: 16,
+                         color: Colors.white
+                     ),
+                   ),
+                 ),
+               ),
+               borderRadius: BorderRadius.circular(10),
+             )
+         ),
+         SizedBox(height: 15),
+       ],
+     ),
+   );
+ }
+
+
+ static  Widget layoutDataNotFound( String text){
+   return Container(
+     width: 300,
+     child: Column(
+       mainAxisAlignment: MainAxisAlignment.center,
+       children: <Widget>[
+         SizedBox(height: 15),
+         Container(
+           margin: EdgeInsets.all(5),
+           alignment: Alignment.topCenter,
+           child: Text(
+             text,
+             style: GoogleFonts.openSans(
+               textStyle: TextStyle(
+                 color: Colors.black45,
+                 fontSize: 18,
+                 fontWeight: FontWeight.w600,
+               ),
+             ),
+           ),
+         ),
+       ],
+     ),
+   );
+ }
  }
 

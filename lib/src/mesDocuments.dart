@@ -55,39 +55,10 @@ class _MesDocuments extends State<MesDocuments> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  Expanded(child:Text(
                     'Liste de mes documents :',
                     style: Constante.style4,
-                  ),
-                  Container(
-                      padding: EdgeInsets.all(15.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.0),
-                        color: Colors.orange,
-                      ),
-                      child:InkWell(
-                        onTap: (){
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) => AddDocument()));
-                        },
-                        child:  Row(
-                          children: [
-                            Text(
-                              'Nouveau documents',
-                              style: Constante.style5.copyWith(
-                                color: Constante.secondaryColor,
-                                fontSize: 12,
-                              ),
-                            ),
-                            Icon(
-                              Icons.note_add_rounded,
-                              color: Constante.secondaryColor,
-                              size: 22,
-                            ),
-                          ],
-                        ),
-                      ),
-                     ),
+                  ), ),
                 ],
               ),
               SizedBox(
@@ -203,6 +174,14 @@ class _MesDocuments extends State<MesDocuments> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orange,
+        onPressed: () async {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AddDocument()));
+        },
+        child: Icon(Icons.note_add_rounded),
       ),
     );
 

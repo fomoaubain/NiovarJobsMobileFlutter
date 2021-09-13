@@ -96,7 +96,7 @@ class _MesLocationsCdt extends State<MesLocationsCdt> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Mes demandes de locations ",
+          "Mes demandes de location ",
           style: Constante.kTitleStyle,
         ),
         centerTitle: true,
@@ -164,12 +164,14 @@ class _MesLocationsCdt extends State<MesLocationsCdt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(" Vous êtes sollicite pour un travail", style: GoogleFonts.questrial(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xF8F6894D),
-                  wordSpacing: 2.5,
-                )),
+                Expanded(
+                  child:Text("Vous êtes sollicite pour un travail", style:  GoogleFonts.questrial(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xF8F6894D),
+                    wordSpacing: 1.5,
+                  )),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -311,7 +313,7 @@ class _MesLocationsCdt extends State<MesLocationsCdt> {
                 Row(
                   children: [
                     Text(
-                        'Status :',
+                        'Statut :',
                         style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.w900)
                     ),
                     SizedBox(
@@ -362,7 +364,7 @@ class _MesLocationsCdt extends State<MesLocationsCdt> {
             msg,
             style: Constante.kSubtitleStyle.copyWith(
               color: Colors.white,
-              fontSize: 12.0,
+              fontSize: 10.0,
             ),
           ),
         ),

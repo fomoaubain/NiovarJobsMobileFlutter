@@ -14,49 +14,49 @@ class GridDashboard extends StatelessWidget {
   Items item1 = new Items(
       id:1,
       title: "Mes candidatures",
-      subtitle: "Manager toutes les offres \n d'emploi auquel vous avez \nsouscrit",
+      subtitle: "Gérer toutes vos \n candidatures",
       event: "",
       img: "assets/candidature.png");
 
   Items item2 = new Items(
     id:2,
-    title: "Mes demandes \n de locations",
-    subtitle: "Manager toutes les demandes  \n de location qui vous  sont adréssées",
+    title: "Mes demandes \n de location",
+    subtitle: "Gérer toutes  les demandes \n de location qui vous \n sont adréssées",
     event: "",
     img: "assets/location.png",
   );
   Items item3 = new Items(
     id:3,
     title: "Mon CV",
-    subtitle: "Renseigner vos compétences afin d'être vu par les meilleures recruteur",
+    subtitle: "Renseigner vos compétences  et diplômes afin d'être vu  par les meilleures recruteurs",
     event: "",
     img: "assets/cv.png",
   );
   Items item4 = new Items(
     id:4,
     title: "Mes documents",
-    subtitle: "Sauvegarder vos diplôme, CV et autre documents utile a votre profil",
+    subtitle: "Sauvegarder vos diplômes, CV et autres documents utiles  à votre profil",
     event: "",
     img: "assets/documents.png",
   );
   Items item5 = new Items(
     id:5,
     title: "Mes affectations",
-    subtitle: "",
+    subtitle: "Gérer toutes les affectations   qui vous  sont adréssées",
     event: "",
     img: "assets/affectation.png",
   );
   Items item6 = new Items(
     id:6,
     title: "Mes talons de paie",
-    subtitle: "",
+    subtitle: "Consluter et télécharger   vos talons de paie",
     event: "",
     img: "assets/paie.png",
   );
   Items item7 = new Items(
     id:7,
     title: "Mes contrats \n de travail",
-    subtitle: "",
+    subtitle: "Consulter et gérer vos \n contrats travail",
     event: "",
     img: "assets/contrat.png",
   );
@@ -115,8 +115,8 @@ class GridDashboard extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset(data.img, width: 42),
-                  SizedBox(height: 10),
+                  Image.asset(data.img, width: 40),
+                  SizedBox(height: 5),
                   Container(
                     margin: EdgeInsets.all(5),
                     alignment: Alignment.topCenter,
@@ -132,7 +132,7 @@ class GridDashboard extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: 5),
+                  SizedBox(height: 2),
                   Container(
                     alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(horizontal: 10),

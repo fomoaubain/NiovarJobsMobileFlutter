@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,6 +12,7 @@ import 'package:niovarjobs/Constante.dart';
 import 'package:niovarjobs/model/Inscrire.dart';
 import 'package:niovarjobs/model/Job.dart';
 import 'package:niovarjobs/model/Postuler.dart';
+import 'package:niovarjobs/services/LocalNotificationService.dart';
 import 'package:niovarjobs/src/AbonnementPage.dart';
 import 'package:niovarjobs/src/DetailsJob.dart';
 import 'package:niovarjobs/src/FaqPage.dart';
@@ -44,7 +47,9 @@ class homePage extends StatefulWidget {
 }
 
 class _homePageState extends  State<homePage> with SingleTickerProviderStateMixin{
+  late FToast fToast;
   late TabController _controller;
+  late final FirebaseMessaging _messaging;
 
   late Future<List<Postuler>>  listOffreVedette;
   late Future<List<Postuler>>  listOffreRecent;
@@ -242,7 +247,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                 children: [
                   Expanded(child:
                   Text(
-                    "Compagnies recommandees",
+                    "Compagnies recommandées",
                     style: Constante.kTitleStyle,
                   ),
                   ),
@@ -276,12 +281,12 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                     }
                     if(snapshot.hasError) {
                       return Center(
-                          child: Text("Aucune connexion disponible", style: TextStyle(color:  Color(0xFFFA5805), fontSize: 16.0))
+                          child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => homePage(title: "")) )
                       );
                     }
                     if(initListInscrire.length==0) {
                       return Center(
-                          child: Text("Aucune compagnie disponible", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                          child: Constante.layoutDataNotFound("Aucune compagnie disponible")
                       );
                     }
                     if(snapshot.hasData) {
@@ -309,7 +314,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => PageCompagny( idPage: nDataList.id,)
+                                    builder: (context) => PageCompagny( nDataList.id,)
                                   ),
 
                                 );
@@ -364,12 +369,12 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                     }
                     if(snapshot.hasError) {
                       return Center(
-                          child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                          child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => homePage(title: "")))
                       );
                     }
                     if(initListJob.length==0) {
                       return Center(
-                          child: Text("Aucune offre d'emploi disponible", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                          child: Constante.layoutDataNotFound("Aucune offre d'emploi disponible")
                       );
                     }
                     if(snapshot.hasData) {
@@ -432,8 +437,20 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                 context, MaterialPageRoute(builder: (context) => LoginPage()));
             return;
           }else{
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => UploadCv()));
+            if(session.type.isNotEmpty && session.type=="client"){
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Veuillez vous connectez avec un compte candidat pour envoyer votre cv'),
+                  backgroundColor: Colors.black87,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                )
+              );
+
+            }else{
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => UploadCv()));
+            }
+
           }
 
         },
@@ -533,7 +550,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
   Widget ShowPupopMenu(){
     return  PopupMenuButton(
       itemBuilder: (BuildContext bc) => [
-        PopupMenuItem(child: Constante.TextwithIcon(Icons.dashboard_outlined, " Mon panel", Colors.black87, 15), value: 1),
+        PopupMenuItem(child: Constante.TextwithIcon(Icons.dashboard_outlined, " Mon tableau de bord", Colors.black87, 15), value: 1),
         PopupMenuItem(
             child: Constante.TextwithIcon(Icons.lock_open_rounded, "Se deconnecter", Colors.black87, 15), value: 2),
       ],
@@ -720,8 +737,11 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
+    fToast = FToast();
+    fToast.init(context);
     _controller = TabController(vsync: this, length: 3);
 
+    loadFirebaseNotification();
     checkUserConnect();
 
     listOffreVedette= this.fetchItem('RestJob/listoffrevedette',2);
@@ -732,6 +752,63 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
     _scrollController.addListener(_onScroll);
     _scrollController2.addListener(_onScroll2);
     _scrollController3.addListener(_onScroll3);
+
+  }
+
+ void loadFirebaseNotification() async {
+    FirebaseMessaging.instance.getInitialMessage().then((message){
+      if(message!=null){
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => homePage(title: "")));
+      }
+    });
+    _messaging = FirebaseMessaging.instance;
+    _messaging.subscribeToTopic('all');
+
+    /*final String? token = await _messaging.getToken();
+    if(token!.isNotEmpty){
+     session.fcmToken=token;
+    }
+    print("Token : "+ token.toString());*/
+
+    // 3. On iOS, this helps to take the user permissions
+    NotificationSettings settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // For handling the received notifications
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        // Parse the message received
+        if(message.notification!=null){
+
+          setState(() {
+            if(message.data["type"].toString().contains("single") ){
+              nbreNotif=nbreNotif+1;
+            }
+          });
+
+          print("premier plan "+message.notification!.body.toString());
+          print("premier plan "+message.notification!.title.toString());
+        }
+
+        LocalNotificationService.display(message);
+      });
+
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print("route  ok pour onMessageOpenApp");
+        setState(() {
+          nbreNotif=nbreNotif+1;
+        });
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => homePage(title: "")));
+      });
+    } else {
+      print('User declined or has not accepted permission');
+    }
   }
 
 
@@ -743,16 +820,21 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
     session.id  = prefs.getString('id')!;
     session.type  = prefs.getString('type')!;
 
-    if(session.id.isNotEmpty){
-      GetNbreNotification();
-    }
-    
     setState(() {
       if(!session.id.isEmpty){
         isLoggedIn = true;
         session.IsConnected=true;
       }
     });
+
+    if(session.id.isNotEmpty){
+      String topic="user"+session.id.toString();
+      _messaging.subscribeToTopic(topic.toString());
+
+      GetNbreNotification();
+    }
+    
+
 
   }
 

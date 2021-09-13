@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/Global.dart'  as session;
 import 'package:niovarjobs/model/Inscrire.dart';
 import 'package:niovarjobs/src/EditPwd.dart';
+import 'package:niovarjobs/widget/Personnal_infos_Clt.dart';
 import 'package:niovarjobs/widget/localisation_infos.dart';
 import 'package:niovarjobs/widget/personnal_infos.dart';
 import 'package:niovarjobs/widget/social_infos.dart';
@@ -187,20 +188,20 @@ class _Profil extends State<Profil> {
                   ),
                   SizedBox(height: size.height*0.03,),
                   Text(
-                    session.login,
-                    style: Constante.kPageTitleStyle.copyWith(fontSize: 25,color: Colors.white),
+                    session.email,
+                    style: Constante.kPageTitleStyle.copyWith(fontSize: 18,color: Colors.white, fontWeight: FontWeight.w400),
                   ),
                   SizedBox(height: size.height*0.03,),
                   Row(
                     children: [
-                      Profilecards(1,'Informations  \n sur mon profil', Icons.perm_contact_calendar_outlined),
-                      Profilecards(2,'Mon adresse\n  ', Icons.location_on),
+                      Profilecards(1,session.type=="client" ? "Profil de la \n   compagnie" :"Informations  \n sur mon profil", Icons.perm_contact_calendar_outlined),
+                      Profilecards(2,session.type=="client" ?'Adresse de\n  la compagnie': "Mon adresse", Icons.location_on),
                     ],
                   ),
                   SizedBox(height: size.height*0.03,),
                   Row(
                     children: [
-                      Profilecards(3,'Réseaux\n sociaux', Icons.alternate_email),
+                      Profilecards(3,session.type=="client" ? 'Réseaux sociaux \n  de la compagnie': "Réseaux \n sociaux", Icons.alternate_email),
                       Profilecards(4,'Changer le \n mot de passe', Icons.edit),
                     ],
                   ),
@@ -226,8 +227,14 @@ class _Profil extends State<Profil> {
                 context, MaterialPageRoute(builder: (context) => EditPwd()));
           }
           if(id==1){
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Personnal_infos()));
+            if(session.type=="client"){
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Personnal_infos_Clt()));
+            }else{
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Personnal_infos()));
+            }
+
           }
           if(id==3){
             Navigator.push(
@@ -293,7 +300,7 @@ class _Profil extends State<Profil> {
         await EditProfil(session.id, _path, _fileName).then((value) async {
           if(value['result_code'].toString()=="1"){
             Navigator.pop(context);
-            Constante.showAlert(context, "Note d'information", "Profil modifier avec succès", SizedBox(), 100);
+            Constante.showAlert(context, "Note d'information", "Profil modifié avec succès", SizedBox(), 100);
             await new Future.delayed(new Duration(seconds: 2));
             Inscrire inscrire = Inscrire.fromJson(value['user']);
             final SharedPreferences prefs = await SharedPreferences.getInstance();

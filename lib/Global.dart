@@ -7,3 +7,5 @@ String type="";
 String profil="";
 
 bool IsConnected= false;
+
+String fcmToken="";

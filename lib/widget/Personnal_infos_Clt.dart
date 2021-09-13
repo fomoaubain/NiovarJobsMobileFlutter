@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,26 +15,29 @@ import 'package:flutter/material.dart';
 import '../Constante.dart';
 import 'package:http/http.dart' as http;
 import 'package:niovarjobs/Global.dart'  as session;
-class Personnal_infos extends StatefulWidget {
+class Personnal_infos_Clt extends StatefulWidget {
 
 
   @override
-  _Personnal_infos createState() => _Personnal_infos();
+  _Personnal_infos_Clt createState() => _Personnal_infos_Clt();
 }
 
-class _Personnal_infos extends State<Personnal_infos> {
+class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
   late FToast fToast;
   late Inscrire inscrire;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool _showLoading = true;
 
-  String idCat="", idEmploi="", sexe="", annee="";
+  String idCat="",  sexe="", annee="";
   late String  telephone="";
   bool validateNumber=false;
   late  final TextEditingController nom ;
   late final TextEditingController email ;
   late final TextEditingController description ;
   late final TextEditingController profession ;
+  late final TextEditingController nomRepre ;
+  late final TextEditingController prenomRepres ;
+  late final TextEditingController numRepres ;
   final TextEditingController controller = TextEditingController();
   String initialCountry = 'CA';
   late PhoneNumber  number = PhoneNumber(isoCode: 'CA');
@@ -46,7 +47,6 @@ class _Personnal_infos extends State<Personnal_infos> {
   String dropdownValue = 'One';
   String tempTravail = 'Aucun choix';
   String selectSexe = 'Aucun choix';
-  String titreEmploi="Aucun choix";
   String S3 = 'Aucun choix';
   late String categorie='Aucun choix';
   late String experience='Aucun choix';
@@ -54,7 +54,7 @@ class _Personnal_infos extends State<Personnal_infos> {
 
   late Future<List<Types>> listCategorie;
   late List<Types> listCategorieData=[];
-  late List<Categorie> listTitreEmploi=[];
+
   late List<Experience> listExperience=[];
 
   late int idCategorie;
@@ -62,37 +62,26 @@ class _Personnal_infos extends State<Personnal_infos> {
   List<String> listSexe=['Aucun choix', 'Feminin', 'Masculin', 'Aucun',];
   List<String> listCategorieLibelle=["Aucun choix"];
   List<String> listExperienceLibelle=["Aucun choix"];
-  List<String> listTitreEmploiLibelle=["Aucun choix"];
-  List<String> listTitreEmploiId=[];
 
 
-  Future FindTitreEmploi(int id ) async{
-    final String pathUrl = Constante.serveurAdress+"RestJob/GetAllTitreEmploi/"+id.toString();
-    print(pathUrl);
-    final response = await http.get(Uri.parse(pathUrl));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body)['datas'];
-      return data;
-    }else{
-      return null;
-    }
-  }
 
-  Future EditInfos(var id, var idCat, var idEmploi, var nom, var sexe, var email, var tel, var description,  var profession, var anneExp) async {
+  Future EditInfos(var id, var idCat, var nom, var sexe, var email, var tel, var description, var nomRepre, var prenomRepre,  var profession, var telRepre) async {
 
     Dio dio = new Dio();
     final String pathUrl = Constante.serveurAdress+"RestUser/Edit";
     FormData formData = new FormData.fromMap({
       'id': id,
-      'nom': nom,
       'categorie': idCat,
-      'domaine': idEmploi,
+      'nom': nom,
       'sexe': sexe,
       'email_prof': email,
       'phone': tel,
       'description': description,
       'titreEmploi': profession,
-      'anneeExperience': anneExp,
+      'nom_representant': nomRepre,
+      'prenom_representant': prenomRepre,
+      'titre_representant': profession,
+      'tel_representant': telRepre,
     });
 
     var response = await dio.post(pathUrl,
@@ -106,77 +95,60 @@ class _Personnal_infos extends State<Personnal_infos> {
   Future _fetchData() async {
     final results = await Future.wait([
       http.get(Uri.parse(Constante.serveurAdress+"RestUser/getUser/"+session.id)),
-     http.get(Uri.parse(Constante.serveurAdress+"RestJob/GetAllAnneeExp")),
-    http.get(Uri.parse(Constante.serveurAdress+"RestJob/GetAllTypes")),
+      http.get(Uri.parse(Constante.serveurAdress+"RestJob/GetAllTypes")),
     ]);
 
     setState(() {
-    final   responseInscrire= jsonDecode(results[0].body)['user'];
-    if(responseInscrire!=null){
-      inscrire = Inscrire.fromJson(responseInscrire);
-      nom = TextEditingController(text: inscrire.nom);
-      email = TextEditingController(text: inscrire.emailProf);
-      description = TextEditingController(text: inscrire.description);
-      profession = TextEditingController(text: inscrire.titreEmploi);
+      final   responseInscrire= jsonDecode(results[0].body)['user'];
+      if(responseInscrire!=null){
+        inscrire = Inscrire.fromJson(responseInscrire);
+        nom = TextEditingController(text: inscrire.nom);
+        email = TextEditingController(text: inscrire.emailProf);
+        description = TextEditingController(text: inscrire.description);
+        profession = TextEditingController(text: inscrire.titreRepresentant);
 
-      if(inscrire.domaine.isNotEmpty){
-        titreEmploi= inscrire.libelleTitreEmploi;
-        listTitreEmploiLibelle.clear();
-        listTitreEmploiLibelle.add(inscrire.libelleTitreEmploi);
-        idEmploi=inscrire.domaine;
-      }
-      if(inscrire.sexe.isNotEmpty){
-        if(inscrire.sexe.toString().contains("F")){
-          selectSexe="Feminin";
+        nomRepre = TextEditingController(text: inscrire.nomRepresentant);
+        prenomRepres = TextEditingController(text: inscrire.prenomRepresentant);
+        numRepres = TextEditingController(text: inscrire.telRepresentant);
+
+
+
+        if(inscrire.sexe.isNotEmpty){
+          if(inscrire.sexe.toString().contains("F")){
+            selectSexe="Feminin";
+          }
+          if(inscrire.sexe.toString().contains("M")){
+            selectSexe="Masculin";
+          }
+          if(inscrire.sexe.toString().contains("FM")){
+            selectSexe="Aucun";
+          }
+          sexe=inscrire.sexe;
         }
-        if(inscrire.sexe.toString().contains("M")){
-          selectSexe="Masculin";
+        if(!inscrire.phone.isEmpty){
+          getPhoneNumber(inscrire.phone);
         }
-        if(inscrire.sexe.toString().contains("FM")){
-          selectSexe="Aucun";
+      }
+
+
+      final responseCategorie = jsonDecode(results[1].body)['datas'];
+      if(responseCategorie!=null){
+        List<Types> listModel = [];
+        responseCategorie.forEach((element) {
+          listModel.add(Types.fromJson(element));
+        });
+        listModel.forEach((element) {
+          listCategorieLibelle.add(element.libelle);
+        });
+        listCategorieData=listModel.toList();
+
+        if(inscrire.categorie.isNotEmpty){
+          categorie= listModel.where((element) => element.id==int.parse(inscrire.categorie)).first.libelle;
+          idCat=inscrire.categorie;
         }
-        sexe=inscrire.sexe;
       }
-      if(!inscrire.phone.isEmpty){
-        getPhoneNumber(inscrire.phone);
-      }
-    }
 
-
-    final responseExperience = jsonDecode(results[1].body)['datas'];
-    if(responseExperience!=null){
-      List<Experience> listModelExperience = [];
-      responseExperience.forEach((element) {
-        listModelExperience.add(Experience.fromJson(element));
-      });
-      listExperience = listModelExperience.toList();
-      listModelExperience.forEach((element) {
-        listExperienceLibelle.add(element.libelle);
-      });
-      if(inscrire.anneeExperience.isNotEmpty){
-        experience= listModelExperience.where((element) => element.id==int.parse(inscrire.anneeExperience)).first.libelle;
-        annee=inscrire.anneeExperience;
-      }
-    }
-
-    final responseCategorie = jsonDecode(results[2].body)['datas'];
-    if(responseCategorie!=null){
-      List<Types> listModel = [];
-      responseCategorie.forEach((element) {
-        listModel.add(Types.fromJson(element));
-      });
-      listModel.forEach((element) {
-        listCategorieLibelle.add(element.libelle);
-      });
-      listCategorieData=listModel.toList();
-
-      if(inscrire.categorie.isNotEmpty){
-        categorie= listModel.where((element) => element.id==int.parse(inscrire.categorie)).first.libelle;
-        idCat=inscrire.categorie;
-      }
-    }
-
-    _showLoading = false;
+      _showLoading = false;
 
     });
   }
@@ -211,7 +183,7 @@ class _Personnal_infos extends State<Personnal_infos> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Informations sur mon profil",
+          " Profil de la compagnie",
           style: Constante.kTitleStyle,
         ),
         centerTitle: true,
@@ -233,18 +205,13 @@ class _Personnal_infos extends State<Personnal_infos> {
 
                   if (!_showLoading) ...[
                     Text(
-                      "Choisir votre catégorie ou domaine d'activité",
+                      "Choisir votre catégorie ou domaine d'activité de votre compagnie",
                       style: Constante.style4,
                     ),
                     SelectCategorie(),
+
                     SizedBox(height:size.height*0.02),
-                    Text("Choisir votre titre d'emploi", style: Constante.style4,),
-                    SelectTitreEmploi(),
-                    SizedBox(height:size.height*0.02),
-                    Text("Année d'experience", style: Constante.style4,),
-                    selectedExperience(),
-                    SizedBox(height:size.height*0.02),
-                    Text("Nom et prenom", style: Constante.style4,),
+                    Text("Nom de la compagnie", style: Constante.style4,),
                     SizedBox(height:size.height*0.01),
                     TextFormField(
                       obscureText: false,
@@ -263,9 +230,6 @@ class _Personnal_infos extends State<Personnal_infos> {
                       ),
                     ),
                     SizedBox(height:size.height*0.03),
-                    Text("Sexe", style: Constante.style4,),
-                    selectedSexe(),
-                    SizedBox(height:size.height*0.02),
                     Text("Email professionnelle", style: Constante.style4,),
                     SizedBox(height:size.height*0.01),
                     TextFormField(
@@ -295,6 +259,7 @@ class _Personnal_infos extends State<Personnal_infos> {
                         return null;
                       },
                     ),
+
                     SizedBox(height:size.height*0.03),
                     Text("Numéro de téléphone", style: Constante.style4,),
                     SizedBox(height:size.height*0.01),
@@ -339,16 +304,83 @@ class _Personnal_infos extends State<Personnal_infos> {
                       },
 
                     ),
+
                     SizedBox(height:size.height*0.04),
-                    Text("Description de votre personnalité", style: Constante.style4,),
+                    Text("Description de votre compagnie", style: Constante.style4,),
                     SizedBox(height:size.height*0.01),
                     Input1(),
+
                     SizedBox(height:size.height*0.03),
-                    Text("Proféssion", style: Constante.style4,),
+                    Text("Nom du représentant de la compagnie", style: Constante.style4,),
+                    SizedBox(height:size.height*0.01),
+                    TextFormField(
+                      obscureText: false,
+                      controller: nomRepre,
+                      decoration: InputDecoration(
+                        hintText: "Saisir ici",
+                        contentPadding: EdgeInsets.symmetric(vertical: 17, horizontal: 15),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: Constante.kBlack.withOpacity(0.2))
+                        ),
+
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black26)
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height:size.height*0.03),
+                    Text("Prénom du représentant de la compagnie", style: Constante.style4,),
+                    SizedBox(height:size.height*0.01),
+                    TextFormField(
+                      obscureText: false,
+                      controller: prenomRepres,
+                      decoration: InputDecoration(
+                        hintText: "Saisir ici",
+                        contentPadding: EdgeInsets.symmetric(vertical: 17, horizontal: 15),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: Constante.kBlack.withOpacity(0.2))
+                        ),
+
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black26)
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height:size.height*0.03),
+                    Text("Sexe", style: Constante.style4,),
+                    selectedSexe(),
+
+                    SizedBox(height:size.height*0.03),
+                    Text("Titre du représentant de la compagnie", style: Constante.style4,),
                     SizedBox(height:size.height*0.01),
                     TextFormField(
                       obscureText: false,
                       controller: profession,
+                      decoration: InputDecoration(
+                        hintText: "Saisir ici",
+                        contentPadding: EdgeInsets.symmetric(vertical: 17, horizontal: 15),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: Constante.kBlack.withOpacity(0.2))
+                        ),
+
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black26)
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height:size.height*0.03),
+                    Text("Numéro de télephone du représentant de la compagnie", style: Constante.style4,),
+                    SizedBox(height:size.height*0.01),
+                    TextFormField(
+                      obscureText: false,
+                      controller: numRepres,
+                      keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
                         hintText: "Saisir ici",
                         contentPadding: EdgeInsets.symmetric(vertical: 17, horizontal: 15),
@@ -375,55 +407,7 @@ class _Personnal_infos extends State<Personnal_infos> {
   }
 
 
-  SelectTitreEmploi(){
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Constante.kBlack.withOpacity(0.2)),
-      ),
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 5, right: 20, top: 5),
-        child: Row(
-          children: [
-            Expanded(
-              child: DropdownButton<String>(
-                value:  titreEmploi,
-                icon: Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: const Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                iconSize: 24,
-                elevation: 16,
-                style: const TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 0,
-                  color: Colors.deepPurpleAccent,
-                ),
-                onChanged: ( newValue) {
-                  listTitreEmploi.forEach((element){
-                    if(newValue== element.libelle){
-                      idEmploi= element.id.toString();
-                    }
-                  });
-                  setState(() {
-                    titreEmploi = newValue!;
-                  });
-                },
-                isExpanded: true,
-                items:listTitreEmploiLibelle.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                      value: value,
-                      child:ItemDropmenu(value)
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   SelectCategorie(){
 
@@ -463,33 +447,9 @@ class _Personnal_infos extends State<Personnal_infos> {
                   setState(() {
                     categorie = newValue!;
                     if(categorie=="Aucun choix"){
-                      titreEmploi="Aucun choix";
-                      listTitreEmploiLibelle.clear();
-                      listTitreEmploiLibelle.add("Aucun choix");
-                      idCat=""; idEmploi="";
+                      idCat="";
                       return;
                     }
-                    Constante.showAlert(context, "Veuillez patientez", "Chargement des titres d'emploi...", SizedBox(), 100);
-                    FindTitreEmploi(idCategorie).then((value){
-                      if(value!=null){
-                        listTitreEmploi.clear();
-                        value.forEach((element) {
-                          listTitreEmploi.add(Categorie.fromJson(element));
-                        });
-                        setState(() {
-                          titreEmploi=listTitreEmploi.first.libelle;
-                          idEmploi= listTitreEmploi.first.id.toString();
-                          listTitreEmploiLibelle.clear();
-                          listTitreEmploi.forEach((element){
-                            listTitreEmploiLibelle.add(element.libelle);
-                          });
-                        });
-
-                        Navigator.pop(context);
-                      }else{
-                        Navigator.pop(context);
-                      }
-                    });
                   });
 
 
@@ -688,7 +648,7 @@ class _Personnal_infos extends State<Personnal_infos> {
       onTap: () async{
         if(formKey.currentState!.validate()){
           Constante.showAlert(context, "Veuillez patientez", "Sauvegarde en cour...", SizedBox(), 100);
-          await EditInfos(session.id,idCat, idEmploi, nom.text, sexe, email.text,telephone,description.text,profession.text,annee).then((value){
+          await EditInfos(session.id,idCat, nom.text, sexe, email.text,telephone,description.text,nomRepre.text, prenomRepres.text,profession.text,numRepres.text).then((value){
             if(value['result_code'].toString().contains("1")){
               Navigator.pop(context);
               Constante.showToastSuccess("Sauvegarde éffectué avec succès ",fToast);

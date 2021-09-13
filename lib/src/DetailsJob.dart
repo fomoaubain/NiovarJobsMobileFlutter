@@ -67,7 +67,6 @@ class _DetailsJob extends State<DetailsJob> {
     final responsePostuler = await http.get(Uri.parse(Constante.serveurAdress+"RestJob/getDetailsOffre/"+id.toString()));
     if (responsePostuler.statusCode == 200) {
       final data = jsonDecode(responsePostuler.body)['postuler'];
-      print(data.toString());
       if (data != null) {
         data.forEach((element) {
           listModel.add(Postuler.fromJson(element));
@@ -253,8 +252,14 @@ class _DetailsJob extends State<DetailsJob> {
               ),
               child:  InkWell(
                 onTap: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => PageCompagny(idPage: postuler.inscrire.id)));
+                  if(postuler.job.immediat.isNotEmpty && postuler.job.immediatLabel.toString()!="direct"){
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => PageCompagny(postuler.inscrire.id)));
+                  }else{
+                    Constante.showToastError("Cette compagnie ne possède pas de page.", fToast);
+
+                  }
+
                 },
                 child: Icon(
                   Icons.home_work_outlined,
@@ -275,7 +280,13 @@ class _DetailsJob extends State<DetailsJob> {
                       return;
                     }
                     if(session.type=="client"){
-                      Constante.showToastError("Impossible de postuler à une offre avec un compte client.", fToast);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Veuillez vous connectez avec un compte candidat pour envoyer votre cv'),
+                            backgroundColor: Colors.black87,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                          )
+                      );
                       return;
                     }else{
                       if(postuler.job.immediatLabel=="direct"){

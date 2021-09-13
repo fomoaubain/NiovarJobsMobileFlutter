@@ -325,7 +325,7 @@ class _AddExperience extends State<AddExperience> {
           await postExperience(session.id,entreprise.text,fonction.text,periode,description.text, enCour).then((value) async {
             if(value['result_code'].toString().contains("1")){
               Navigator.pop(context);
-              Constante.showToastSuccess("Sauvegarde éffectué avec succès ",fToast);
+              Constante.showToastSuccess("Sauvegarde effectuée avec succès ",fToast);
               await new Future.delayed(new Duration(seconds: 2));
               Navigator.pop(context,true);
             }else{
@@ -366,7 +366,7 @@ class _AddExperience extends State<AddExperience> {
       context: context,
       initialDate: selectedDateDebut,
       firstDate: DateTime(1980),
-      lastDate: DateTime(2050),
+      lastDate: DateTime.now(),
     );
     if (selected != null && selected != selectedDateDebut)
       setState(() {

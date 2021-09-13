@@ -116,12 +116,13 @@ class _ListCompagnie extends State<ListCompagnie> {
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => ListCompagnie()))
+
               );
             }
             if(initListInscrire.length==0) {
               return Center(
-                  child: Text("Aucune compagnie disponible", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucune compagnie disponible")
               );
             }
             if(snapshot.hasData) {
@@ -238,7 +239,7 @@ class _ListCompagnie extends State<ListCompagnie> {
     onTap: () {
 
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => PageCompagny( idPage: inscrire.id,)));
+          context, MaterialPageRoute(builder: (context) => PageCompagny( inscrire.id,)));
     },
   );
 }

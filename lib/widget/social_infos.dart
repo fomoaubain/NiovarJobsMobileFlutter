@@ -30,6 +30,7 @@ class _Social_infos extends State<Social_infos> {
 
   late  final TextEditingController facebook;
   late final TextEditingController linkedin ;
+  late final TextEditingController siteWeb ;
   late Future <Inscrire> currentInscrire;
 
   late Inscrire inscrire;
@@ -43,6 +44,7 @@ class _Social_infos extends State<Social_infos> {
         inscrire = Inscrire.fromJson(data);
         facebook = TextEditingController(text: inscrire.facebook);
         linkedin = TextEditingController(text: inscrire.linkedin);
+        siteWeb = TextEditingController(text: inscrire.website);
       }
     }
 
@@ -50,7 +52,7 @@ class _Social_infos extends State<Social_infos> {
   }
 
 
-  Future EditInfos(var id, var facebook, var linkedin) async {
+  Future EditInfos(var id, var facebook, var linkedin, var siteWeb) async {
 
     Dio dio = new Dio();
     final String pathUrl = Constante.serveurAdress+"RestUser/Edit";
@@ -58,6 +60,7 @@ class _Social_infos extends State<Social_infos> {
       'id': id,
       'linkedin': linkedin,
       'facebook': facebook,
+      'website': siteWeb,
 
     });
 
@@ -128,6 +131,37 @@ class _Social_infos extends State<Social_infos> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
+                        if (session.type=="client") ...[
+                          SizedBox(height:size.height*0.02),
+                          Text("Lien vers site web de votre compagnie", style: Constante.style4,),
+                          SizedBox(height:size.height*0.01),
+                          TextFormField(
+                            obscureText: false,
+                            controller: siteWeb,
+                            decoration: InputDecoration(
+                              hintText: "Saisir ici",
+                              contentPadding: EdgeInsets.symmetric(vertical: 17, horizontal: 15),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide(color: Constante.kBlack.withOpacity(0.2))
+                              ),
+
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black26)
+                              ),
+                            ),
+                            validator: (String ? value){
+                              if(value!.isEmpty){
+                                return "";
+                              }
+                              if(value.length>50){
+                                return "maximum 50 caracteres";
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
 
                         SizedBox(height:size.height*0.02),
                         Text("Lien vers facebook", style: Constante.style4,),
@@ -211,7 +245,7 @@ class _Social_infos extends State<Social_infos> {
       onTap: () async{
         if(formKey.currentState!.validate()){
           Constante.showAlert(context, "Veuillez patientez", "Sauvegarde en cour...", SizedBox(), 100);
-          await EditInfos(session.id,facebook.text, linkedin.text).then((value){
+          await EditInfos(session.id,facebook.text, linkedin.text, siteWeb.text).then((value){
             print(value);
             if(value['result_code'].toString().contains("1")){
               Navigator.pop(context);

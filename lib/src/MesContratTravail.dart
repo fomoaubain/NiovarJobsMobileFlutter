@@ -6,6 +6,7 @@ import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/Constante.dart';
 import 'package:niovarjobs/model/Affectations.dart';
 import 'package:niovarjobs/model/ContratTravail.dart';
@@ -118,7 +119,7 @@ class _MesContratTravail extends State<MesContratTravail> {
             }
             if(initListContratTravail.length==0) {
               return Center(
-                  child: Text("Aucun contrat de travail trouvée", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Text("Aucun contrat de travail trouvé", style: TextStyle(color: Colors.orange, fontSize: 16.0))
               );
             }
             if(snapshot.hasData) {
@@ -164,7 +165,14 @@ class _MesContratTravail extends State<MesContratTravail> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Contrat de travail", style: Constante.kPageTitleStyle),
+                Expanded(
+                  child:Text("Contrat de travail", style:  GoogleFonts.questrial(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xF8F6894D),
+                    wordSpacing: 1.5,
+                  )),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -232,7 +240,7 @@ class _MesContratTravail extends State<MesContratTravail> {
                 Row(
                   children: [
                     Text(
-                        'Status :',
+                        'Statut :',
                         style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.w900)
                     ),
                     SizedBox(
@@ -276,7 +284,7 @@ class _MesContratTravail extends State<MesContratTravail> {
             msg,
             style: Constante.kSubtitleStyle.copyWith(
               color: Colors.white,
-              fontSize: 12.0,
+              fontSize: 10.0,
             ),
           ),
         ),

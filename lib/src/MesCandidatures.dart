@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/Constante.dart';
 import 'package:niovarjobs/model/Postuler.dart';
 
@@ -166,7 +167,14 @@ class _MesCandidatures extends State<MesCandidatures> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(item.job.titre, style: Constante.kPageTitleStyle),
+                Expanded(
+                  child:Text(item.job.titre, style:  GoogleFonts.questrial(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xF8F6894D),
+                    wordSpacing: 1.5,
+                  )),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -296,7 +304,7 @@ class _MesCandidatures extends State<MesCandidatures> {
                 Row(
                   children: [
                     Text(
-                        'Status :',
+                        'Statut :',
                         style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.w900)
                     ),
                     SizedBox(
@@ -353,7 +361,7 @@ class _MesCandidatures extends State<MesCandidatures> {
             msg,
             style: Constante.kSubtitleStyle.copyWith(
               color: Colors.white,
-              fontSize: 12.0,
+              fontSize: 10.0,
             ),
           ),
         ),

@@ -6,6 +6,7 @@ import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/Constante.dart';
 import 'package:niovarjobs/model/Affectations.dart';
 import 'package:niovarjobs/model/Files.dart';
@@ -97,7 +98,7 @@ class _MesAffectations extends State<MesAffectations> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Mes lettres d'affectations",
+          "Mes lettres d'affectation",
           style: Constante.kTitleStyle,
         ),
         centerTitle: true,
@@ -163,7 +164,14 @@ class _MesAffectations extends State<MesAffectations> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Lettre d'affectation", style: Constante.kPageTitleStyle),
+                Expanded(
+                  child:Text("Lettre d'affectation", style:  GoogleFonts.questrial(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xF8F6894D),
+                    wordSpacing: 1.5,
+                  )),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -231,7 +239,7 @@ class _MesAffectations extends State<MesAffectations> {
                 Row(
                   children: [
                     Text(
-                        'Status :',
+                        'Statut :',
                         style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.w900)
                     ),
                     SizedBox(
@@ -277,7 +285,7 @@ class _MesAffectations extends State<MesAffectations> {
             msg,
             style: Constante.kSubtitleStyle.copyWith(
               color: Colors.white,
-              fontSize: 12.0,
+              fontSize: 10.0,
             ),
           ),
         ),

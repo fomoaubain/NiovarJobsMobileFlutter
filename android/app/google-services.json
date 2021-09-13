@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "117086430844",
+    "project_id": "niovarjobsappflutter",
+    "storage_bucket": "niovarjobsappflutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117086430844:android:f394a876411e8835f94bf9",
+        "android_client_info": {
+          "package_name": "com.niovar.niovarjobs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "117086430844-qb3vj5ashg9qkjn36sl7chm29j42lun0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzSoE4RTvZBN_TRqAWnf7bj1TPEEsjuBU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "117086430844-qb3vj5ashg9qkjn36sl7chm29j42lun0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

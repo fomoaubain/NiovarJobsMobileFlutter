@@ -301,7 +301,7 @@ class _CvPage extends State<CvPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                      "Experiences\nproffessionnelles",
+                      "Expérience\nprofessionnelles",
                       style: Constante.kPageTitleStyle.copyWith(fontSize: 20)
                   ),
                 ),
@@ -473,7 +473,7 @@ class _CvPage extends State<CvPage> {
     ),
     trailing: InkWell(
       onTap: (){
-        Constante.showAlert(context, "Alerte !", "Voulez-vous vraiment supprimer cette élément ?",
+        Constante.showAlert(context, "Alerte !", "Voulez-vous vraiment supprimer cette education ?",
             SizedBox(
               child: RaisedButton(
                 padding: EdgeInsets.all(10),
@@ -533,7 +533,7 @@ class _CvPage extends State<CvPage> {
     ),
     trailing: InkWell(
       onTap: (){
-        Constante.showAlert(context, "Alerte !", "Voulez-vous vraiment supprimer cette élément ?",
+        Constante.showAlert(context, "Alerte !", "Voulez-vous vraiment supprimer cette expérience ?",
             SizedBox(
               child: RaisedButton(
                 padding: EdgeInsets.all(10),
@@ -595,7 +595,7 @@ class _CvPage extends State<CvPage> {
      ),
      trailing: InkWell(
        onTap: (){
-         Constante.showAlert(context, "Alerte !", "Voulez-vous vraiment supprimer cette élément ?",
+         Constante.showAlert(context, "Alerte !", "Voulez-vous vraiment supprimer cette expérience ?",
              SizedBox(
                child: RaisedButton(
                  padding: EdgeInsets.all(10),

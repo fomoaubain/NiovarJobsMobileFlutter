@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:niovarjobs/animation/FadeAnimation.dart';
 import 'package:niovarjobs/model/Inscrire.dart';
@@ -8,14 +9,29 @@ import 'package:niovarjobs/src/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Constante.dart';
+import 'package:niovarjobs/Global.dart' as session;
 
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+
+  @override
+  _LoginPage createState() => _LoginPage();
+}
+
+class _LoginPage extends State<LoginPage>  {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late String  email;
   final TextEditingController pwd = TextEditingController();
 
-  Future Login( String email,  String pwd ) async{
+
+
+  @override
+ void initState()  {
+    super.initState();
+  }
+
+
+  Future Login( String email,  String pwd) async{
     Dio dio = new Dio();
     final String pathUrl = Constante.serveurAdress+"RestUser/Login";
     FormData formData = new FormData.fromMap({
@@ -29,6 +45,7 @@ class LoginPage extends StatelessWidget {
 
     return response.data;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -191,6 +208,7 @@ class LoginPage extends StatelessWidget {
                           height: 60,
                           onPressed: () async{
                             if(formKey.currentState!.validate()){
+                              print("Token : "+ session.fcmToken);
                               Constante.showAlert(context, "Veuillez patientez", "Connexion en cour...", SizedBox(), 100);
                               await Login( email, pwd.text).then((value) async {
                                 if(value['result_code'].toString()=="1"){
@@ -202,7 +220,7 @@ class LoginPage extends StatelessWidget {
                                     prefs.setString('id', inscrire.id.toString());
                                     prefs.setString('email', inscrire.email);
                                     prefs.setString('type', inscrire.type);
-                                    prefs.setString('profil', inscrire.profilName);
+                                    prefs.setString('profil', inscrire.type=="client" ? inscrire.profilCompagnie: inscrire.profilName);
                                   }
 
                                 // Navigator.push(context, MaterialPageRoute(builder: (context) => homePage(title: "")));
@@ -267,13 +285,9 @@ class LoginPage extends StatelessWidget {
                                 child: Image.asset("assets/Facebook-logo.png", height: 50,),
                               )
                           ),
-
                         ],
                       ),
-
                     ),
-
-
 
                   ],
                 ),
@@ -282,7 +296,6 @@ class LoginPage extends StatelessWidget {
             ],
           ),
         )
-
 
       ),
     );

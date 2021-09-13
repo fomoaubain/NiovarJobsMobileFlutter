@@ -133,7 +133,7 @@ class _VerifyEmailPage extends State<VerifyEmailPage> {
                   Navigator.pop(context);
                   String code=value['code'].toString();
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => CodeVerificationPage(email.text, code)));
+                      context, MaterialPageRoute(builder: (context) => CodeVerificationPage(email.text, code, true)));
 
                 }else{
                   Navigator.pop(context);
