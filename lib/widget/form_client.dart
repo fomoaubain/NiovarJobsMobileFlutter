@@ -24,6 +24,7 @@ class _form_client extends State<form_client> {
 
   late String name, email, telephone;
   bool validateNumber=false;
+  bool isLoading = false;
 
   final TextEditingController pwd = TextEditingController();
   final TextEditingController confirm_pwd = TextEditingController();
@@ -262,36 +263,27 @@ class _form_client extends State<form_client> {
                                 minWidth: double.infinity,
                                 height: 60,
                                 onPressed: () async {
-
                                   if(formKey.currentState!.validate()){
-                                    Constante.showAlert(context, "Veuillez patientez", "Creation de votre compte en cour...", SizedBox(), 100);
+                                    setState(() {
+                                      isLoading=true;
+                                    });
                                     await CreateCompte(name, email, telephone, pwd.text, Constante.typeClient).then((value){
+                                      setState(() {
+                                        isLoading=false;
+                                      });
                                       if(value['result_code'].toString().contains("1")){
                                         String code=value['code'].toString();
-                                        Navigator.pop(context);
                                         Navigator.push(
                                             context, MaterialPageRoute(builder: (context) => CodeVerificationPage(email, code, false)));
                                       }else{
-                                        Navigator.pop(context);
-                                        Constante.showAlert(context, "Note d'information", value['message'].toString(),
-                                            SizedBox(
-                                              child: RaisedButton(
-                                                padding: EdgeInsets.all(10),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  "Fermer",
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                                color:Colors.orange,
-                                              ),
-                                            ),
-                                            170);
+                                        Constante.AlertMessageFromRequest(context,value['message'].toString());
                                       }
-
-                                    }
-                                    );
+                                    }).catchError((error){
+                                      setState(() {
+                                        isLoading=false;
+                                        Constante.AlertInternetNotFound(context);
+                                      });
+                                    });
 
                                   }else{
                                     print("unsuccefully");
@@ -302,7 +294,15 @@ class _form_client extends State<form_client> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12.0)
                                 ),
-                                child: Text("Creer mon compte", style: TextStyle(
+                                child: (isLoading)
+                                    ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 1.5,
+                                    ))
+                                    :Text("Creer mon compte", style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 18,
                                     color: Colors.white

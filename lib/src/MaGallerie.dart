@@ -91,12 +91,12 @@ class _MaGallerie extends State<MaGallerie> {
                 }
                 if(snapshot.hasError) {
                   return Center(
-                      child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                      child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MaGallerie(widget.idIns)))
                   );
                 }
                 if(initListGallerie.length==0) {
                   return Center(
-                      child: Text("Aucune image trouvée", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                      child: Constante.layoutDataNotFound("Aucune image trouvée")
                   );
                 }
                 if(snapshot.hasData) {

@@ -81,16 +81,16 @@ class _FaqPage extends State<FaqPage> {
           future: listFaqRecent,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerSimpleVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => FaqPage()))
               );
             }
             if(!snapshot.hasData) {
               return Center(
-                  child: Text("Aucune donnée trouvée", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucune donnée trouvée")
               );
             }
             if(snapshot.hasData) {
@@ -114,7 +114,7 @@ class _FaqPage extends State<FaqPage> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerSimpleVertical(10);
           },
         ),
       ),

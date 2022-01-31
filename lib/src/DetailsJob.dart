@@ -82,8 +82,8 @@ class _DetailsJob extends State<DetailsJob> {
 
   @override
   void initState() {
-
     super.initState();
+
     fToast = FToast();
     fToast.init(context);
     _fetchData(this.idJob.toString());
@@ -125,37 +125,49 @@ class _DetailsJob extends State<DetailsJob> {
           child: Column(
             children: <Widget>[
               Container(
-                constraints: BoxConstraints(maxHeight: 250.0),
+                constraints: BoxConstraints(maxHeight: 170.0),
                 child: Column(
                   children: <Widget>[
-                    Center(
-                      child: Container(
-                        width: 70.0,
-                        height: 70.0,
-                    decoration: BoxDecoration(
-                border: Border.all(color: Colors.orange.withOpacity(.5)),
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-                       child: Card(
-                         child: CachedNetworkImage(
-                           imageUrl: Constante.serveurAdress+postuler.inscrire.profilName,
-                           placeholder: (context, url) => CupertinoActivityIndicator(),
-                           errorWidget: (context, url, error) => Icon(Icons.error),
-                         ),
-                       ),
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child:Container(
+                              margin: EdgeInsets.symmetric(horizontal: 10),
+                              width: 100.0,
+                              height: 100.0,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.orange.withOpacity(.5)),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: Card(
+                                child: CachedNetworkImage(
+                                  imageUrl: Constante.serveurAdress+postuler.inscrire.profilName,
+                                  placeholder: (context, url) => CupertinoActivityIndicator(),
+                                  errorWidget: (context, url, error) => Icon(Icons.error),
+                                ),
+                              ),
+                            ),
+                        ),
+                        Expanded(
+                            child: Container(
+                              child:Column(
+                                children: [
+                                  Text(
+                                    initPostuler.job.titre,
+                                    style: Constante.kTitleStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5.0),
+                                  TextwithIcon(Icons.location_on,postuler.job.pays+ ", " +postuler.job.province +", " +  postuler.job.ville , Colors.black45,12),
+                                  TextwithIcon(Icons.date_range, postuler.job.created, Colors.black45,12),
+                                  Constante.makeJobUgentOrInstantane(postuler.job),
+                                ],
+                              ) ,
+                            ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 20.0),
-                    Text(
-                      initPostuler.job.titre,
-                      style: Constante.kTitleStyle.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5.0),
-                    TextwithIcon(Icons.location_on,postuler.job.pays+ ", " +postuler.job.province +", " +  postuler.job.ville , Colors.black45,12),
-                    TextwithIcon(Icons.date_range, postuler.job.created, Colors.black45,12),
-                    makeVedette(postuler.job),
                     SizedBox(height: 5.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -7,7 +7,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/services/LocalNotificationService.dart';
+import 'package:niovarjobs/src/MesAffectations.dart';
+import 'package:niovarjobs/src/MesCandidatures.dart';
+import 'package:niovarjobs/src/MesContratTravail.dart';
+import 'package:niovarjobs/src/MesLocationsCdt.dart';
 import 'package:niovarjobs/src/Splaschscreen.dart';
+import 'package:niovarjobs/src/mesTalonPaie.dart';
+import 'package:niovarjobs/src/notificationPage.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'src/homePage.dart';
 import 'package:flutter/services.dart';
@@ -63,6 +69,16 @@ class MyApp extends StatelessWidget {
         }
       },
       child:MaterialApp(
+        routes: {
+          // When navigating to the "/second" route, build the SecondScreen widget.
+          '/notification': (context) =>  NotificationPage(),
+          '/candidature': (context) =>  MesCandidatures(),
+          '/affectation': (context) =>  MesAffectations(),
+          '/contrat': (context) =>  MesContratTravail(),
+          '/talon': (context) =>  MesTalonPaie(),
+          '/location': (context) =>  MesLocationsCdt(),
+          //'/paiement': (context) =>  MesTalonPaie(),
+        },
         theme: ThemeData(
           // This is the theme of your application.
           //

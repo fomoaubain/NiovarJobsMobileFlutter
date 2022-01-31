@@ -26,6 +26,8 @@ class _PasswordForget extends State<PasswordForget> {
   TextEditingController pwd = TextEditingController();
   TextEditingController confirm_pwd = TextEditingController();
   late FToast fToast;
+  bool isLoading = false;
+
 
   Future EditPwd( String email,  String pwd) async{
     Dio dio = new Dio();
@@ -164,10 +166,14 @@ class _PasswordForget extends State<PasswordForget> {
           color: Colors.orange,
           child: InkWell( onTap: () async {
             if(formKey.currentState!.validate()){
-              Constante.showAlert(context, "Veuillez patientez", "Réinitialisation du mot de passe en cour...", SizedBox(), 100);
+              setState(() {
+                isLoading=true;
+              });
               await EditPwd(widget.email,pwd.text).then((value) async {
+                setState(() {
+                  isLoading=false;
+                });
                 if(value['result_code'].toString().contains("1")){
-                  Navigator.pop(context);
                   final SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.clear();
                   Constante.showToastSuccess("Mot de passe réinitialiser avec succès ",fToast);
@@ -176,24 +182,13 @@ class _PasswordForget extends State<PasswordForget> {
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => LoginPage()));
                 }else{
-                  Navigator.pop(context);
-                  Constante.showAlert(context, "Note d'information", value['message'].toString(),
-                      SizedBox(
-                        child: RaisedButton(
-                          padding: EdgeInsets.all(10),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "Fermer",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          color:Colors.orange,
-                        ),
-                      ),
-                      170);
+                  Constante.AlertMessageFromRequest(context,value['message'].toString());
                 }
-
+              }).catchError((error){
+                setState(() {
+                  isLoading=false;
+                  Constante.AlertInternetNotFound(context);
+                });
               });
 
             }else{
@@ -204,7 +199,15 @@ class _PasswordForget extends State<PasswordForget> {
               height: 55,
               width: double.infinity,
               child: Center(
-                child: Text(text,style: Constante.kTitleStyle.copyWith(
+                child:(isLoading)
+                    ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 1.5,
+                    ))
+                    :  Text(text,style: Constante.kTitleStyle.copyWith(
                     color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400

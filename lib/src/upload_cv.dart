@@ -13,7 +13,6 @@ import '../Constante.dart';
 
 class UploadCv extends StatefulWidget {
 
-
   @override
   _UploadCv createState() => _UploadCv();
 }
@@ -36,6 +35,7 @@ class _UploadCv extends State<UploadCv> {
   bool _hasValidMime = false;
   late FileType _pickingType;
   late bool imageCheck = false;
+  bool isLoading = false;
 
   Future uploadCv(String pseudo, String path, String fileName  ) async{
     Dio dio = new Dio();
@@ -44,7 +44,6 @@ class _UploadCv extends State<UploadCv> {
       "login": pseudo,
       "file": await MultipartFile.fromFile(path, filename: fileName),
     });
-
     var response = await dio.post(pathUrl,
       data: await formData,
     );
@@ -204,11 +203,14 @@ class _UploadCv extends State<UploadCv> {
               _showToast("Veuillez selectionner votre CV");
               return;
             }
-
-            Constante.showAlert(context, "Veuillez patientez", "Envoie du CV en cour...", SizedBox(), 100);
+            setState(() {
+              isLoading=true;
+            });
             await uploadCv(t1Controller.text, _path, _fileName).then((value){
+              setState(() {
+                isLoading=false;
+              });
               if(value['result_code'].toString()=="1"){
-                Navigator.pop(context);
                 Constante.showAlert(context, "Note d'information", "Votre CV à été importer avec succès et seras analysé par l'équipe NiovarJobs ",
                     SizedBox(
                       child: RaisedButton(
@@ -231,35 +233,29 @@ class _UploadCv extends State<UploadCv> {
                     ),
                     170);
               }else{
-                Navigator.pop(context);
-                Constante.showAlert(context, "Alerte !", value['message'].toString(),
-                    SizedBox(
-                      child: RaisedButton(
-                        padding: EdgeInsets.all(10),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          "Fermer",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        color:Colors.redAccent,
-                      ),
-                    ),
-                    170);
+                Constante.AlertMessageFromRequest(context,value['message'].toString());
               }
-
             }
-            );
-
-
-
+            ).catchError((error){
+              setState(() {
+                isLoading=false;
+                Constante.AlertInternetNotFound(context);
+              });
+            });
           },
             child: Container(
               height: 55,
               width: double.infinity,
               child: Center(
-                child: Text(text,style: Constante.kTitleStyle.copyWith(
+                child: (isLoading)
+                    ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 1.5,
+                    ))
+                    :Text(text,style: Constante.kTitleStyle.copyWith(
                     color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400

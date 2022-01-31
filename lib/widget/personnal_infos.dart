@@ -7,6 +7,9 @@ import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 import 'package:niovarjobs/model/Categorie.dart';
 import 'package:niovarjobs/model/Experience.dart';
 import 'package:niovarjobs/model/Inscrire.dart';
@@ -28,9 +31,9 @@ class _Personnal_infos extends State<Personnal_infos> {
   late FToast fToast;
   late Inscrire inscrire;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  bool _showLoading = true;
+  bool _showLoading = true ,  isLoading = false;
 
-  String idCat="", idEmploi="", sexe="", annee="";
+  String listIdCatSelected="", idEmploi="", sexe="", annee="";
   late String  telephone="";
   bool validateNumber=false;
   late  final TextEditingController nom ;
@@ -65,10 +68,13 @@ class _Personnal_infos extends State<Personnal_infos> {
   List<String> listTitreEmploiLibelle=["Aucun choix"];
   List<String> listTitreEmploiId=[];
 
+  late List<Types> _selectedCategorie = [];
+
+  List<Types> _selectedCategorieInitValue = [];
+
 
   Future FindTitreEmploi(int id ) async{
     final String pathUrl = Constante.serveurAdress+"RestJob/GetAllTitreEmploi/"+id.toString();
-    print(pathUrl);
     final response = await http.get(Uri.parse(pathUrl));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['datas'];
@@ -78,14 +84,14 @@ class _Personnal_infos extends State<Personnal_infos> {
     }
   }
 
-  Future EditInfos(var id, var idCat, var idEmploi, var nom, var sexe, var email, var tel, var description,  var profession, var anneExp) async {
+  Future EditInfos(var id, var listIdCatSelected, var idEmploi, var nom, var sexe, var email, var tel, var description,  var profession, var anneExp) async {
 
     Dio dio = new Dio();
     final String pathUrl = Constante.serveurAdress+"RestUser/Edit";
     FormData formData = new FormData.fromMap({
       'id': id,
       'nom': nom,
-      'categorie': idCat,
+      'categorie': listIdCatSelected,
       'domaine': idEmploi,
       'sexe': sexe,
       'email_prof': email,
@@ -100,7 +106,6 @@ class _Personnal_infos extends State<Personnal_infos> {
     );
 
     return response.data;
-
   }
 
   Future _fetchData() async {
@@ -171,8 +176,10 @@ class _Personnal_infos extends State<Personnal_infos> {
       listCategorieData=listModel.toList();
 
       if(inscrire.categorie.isNotEmpty){
-        categorie= listModel.where((element) => element.id==int.parse(inscrire.categorie)).first.libelle;
-        idCat=inscrire.categorie;
+        inscrire.categorie.toString().split(",").forEach((item) {
+          _selectedCategorieInitValue.add(listModel.where((element) => element.id==int.parse(item)).first);
+        });
+        listIdCatSelected=inscrire.categorie;
       }
     }
 
@@ -233,13 +240,10 @@ class _Personnal_infos extends State<Personnal_infos> {
 
                   if (!_showLoading) ...[
                     Text(
-                      "Choisir votre catégorie ou domaine d'activité",
+                      "Choisir vos catégories ou domaine d'activité",
                       style: Constante.style4,
                     ),
-                    SelectCategorie(),
-                    SizedBox(height:size.height*0.02),
-                    Text("Choisir votre titre d'emploi", style: Constante.style4,),
-                    SelectTitreEmploi(),
+                    MultiSelectCategorie(),
                     SizedBox(height:size.height*0.02),
                     Text("Année d'experience", style: Constante.style4,),
                     selectedExperience(),
@@ -374,58 +378,7 @@ class _Personnal_infos extends State<Personnal_infos> {
 
   }
 
-
-  SelectTitreEmploi(){
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Constante.kBlack.withOpacity(0.2)),
-      ),
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 5, right: 20, top: 5),
-        child: Row(
-          children: [
-            Expanded(
-              child: DropdownButton<String>(
-                value:  titreEmploi,
-                icon: Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: const Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                iconSize: 24,
-                elevation: 16,
-                style: const TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 0,
-                  color: Colors.deepPurpleAccent,
-                ),
-                onChanged: ( newValue) {
-                  listTitreEmploi.forEach((element){
-                    if(newValue== element.libelle){
-                      idEmploi= element.id.toString();
-                    }
-                  });
-                  setState(() {
-                    titreEmploi = newValue!;
-                  });
-                },
-                isExpanded: true,
-                items:listTitreEmploiLibelle.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                      value: value,
-                      child:ItemDropmenu(value)
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  SelectCategorie(){
+  /*SelectCategorie(){
 
     return Container(
       decoration: BoxDecoration(
@@ -484,15 +437,12 @@ class _Personnal_infos extends State<Personnal_infos> {
                             listTitreEmploiLibelle.add(element.libelle);
                           });
                         });
-
                         Navigator.pop(context);
                       }else{
                         Navigator.pop(context);
                       }
                     });
                   });
-
-
                 },
                 isExpanded: true,
                 items: listCategorieLibelle.map<DropdownMenuItem<String>>((String value) {
@@ -507,6 +457,36 @@ class _Personnal_infos extends State<Personnal_infos> {
           ],
         ),
       ),
+    );
+  }*/
+  MultiSelectCategorie(){
+    return MultiSelectBottomSheetField(
+//  items: listCategorieData.map((e) => MultiSelectItem(e, e.libelle)).toList(),
+      items: listCategorieData.map((e) => MultiSelectItem<Types>(e, e.libelle))
+          .toList(),
+      initialValue: _selectedCategorieInitValue.toList(),
+      validator: (values) {
+        if (values == null || values.isEmpty) {
+          return "Veuillez choisir au moins une catégorie";
+        }
+
+        if (values.length>4) {
+          return "Impossible de selectionnez plus de 4 catégories";
+        }
+        return null;
+      },
+      listType: MultiSelectListType.CHIP,
+      cancelText: Text("Annuler"),
+      confirmText: Text("Terminer"),
+      title:Text("Cliquer ici pour selectionner"),
+      searchable:true,
+      searchHint: "Selectionner",
+      onConfirm: (values) {
+        setState(() {
+          _selectedCategorie= values.cast<Types>().toList();
+        });
+
+      },
     );
   }
 
@@ -687,41 +667,49 @@ class _Personnal_infos extends State<Personnal_infos> {
     return  InkWell(
       onTap: () async{
         if(formKey.currentState!.validate()){
-          Constante.showAlert(context, "Veuillez patientez", "Sauvegarde en cour...", SizedBox(), 100);
-          await EditInfos(session.id,idCat, idEmploi, nom.text, sexe, email.text,telephone,description.text,profession.text,annee).then((value){
+          setState(() {isLoading = true;});
+          listIdCatSelected="";
+          _selectedCategorie.forEach((element) {
+            listIdCatSelected+=element.id.toString()+",";
+          });
+          listIdCatSelected = listIdCatSelected.substring(0, listIdCatSelected.length - 1);
+
+          await EditInfos(session.id,listIdCatSelected, idEmploi, nom.text, sexe, email.text,telephone,description.text,profession.text,annee).then((value){
+            setState(() {isLoading = false;});
             if(value['result_code'].toString().contains("1")){
-              Navigator.pop(context);
+
               Constante.showToastSuccess("Sauvegarde éffectué avec succès ",fToast);
 
             }else{
-              Navigator.pop(context);
-              Constante.showAlert(context, "Note d'information", value['message'].toString(),
-                  SizedBox(
-                    child: RaisedButton(
-                      padding: EdgeInsets.all(10),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        "Fermer",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      color:Colors.orange,
-                    ),
-                  ),
-                  170);
+              Constante.AlertMessageFromRequest(context,value['message'].toString());
             }
-
           }
-          );
+          ).catchError((error){
+            setState(() {
+              isLoading=false;
+              Constante.AlertInternetNotFound(context);
+            });
+          });
         }else{
           Constante.showToastError("Veuillez remplir les champs obligatoire ", fToast);
         }
       },
       child: Container(
           margin: EdgeInsets.symmetric(horizontal: 10),
-          child:
-          Icon(Icons.check, color: Colors.green,)
+          child: (isLoading)
+              ? MaterialButton(
+              minWidth: 20,
+              height: 20,
+              onPressed: () {  },
+              child:const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.orange,
+                    strokeWidth: 1.5,
+                  ))
+          )
+              : Icon(Icons.check, color: Colors.green,)
       ),
 
     );

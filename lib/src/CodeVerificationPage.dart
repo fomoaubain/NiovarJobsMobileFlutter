@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:niovarjobs/src/PasswordForget.dart';
+import 'package:niovarjobs/src/SouscrireAlerte.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/material.dart';
@@ -228,7 +229,7 @@ class _CodeVerificationPage extends State<CodeVerificationPage> {
                   ),
                   TextButton(
                       onPressed: () async {
-                        Constante.showAlert(context, "Veuillez patientez", "Envoie du courriel en cour en cour...", SizedBox(), 100);
+                        Constante.showAlert(context, "Veuillez patientez", "Envoie du courriel en cour...", SizedBox(), 100);
                         await VerifyEmail(widget.email.toString()).then((value){
                           if(value['result_code'].toString().contains("1")){
                             Navigator.pop(context);
@@ -298,10 +299,19 @@ class _CodeVerificationPage extends State<CodeVerificationPage> {
                           Constante.showAlert(context, "Veuillez patientez", "Vérification en cour...", SizedBox(), 100);
                           await confirmCompte(widget.email.toString()).then((value){
                             if(value['result_code'].toString().contains("1")){
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                              Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => LoginPage()));
+                              if(value['typeUser'].toString()=="candidat"){
+                                var idUser = value['idUser'].toString();
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context, MaterialPageRoute(builder: (context) => SouscrireAlerte(idUser)));
+                              }else{
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context, MaterialPageRoute(builder: (context) => LoginPage()));
+                              }
+
                             }else{
                               Navigator.pop(context);
                               Constante.showAlert(context, "Note d'information", value['message'].toString(),

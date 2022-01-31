@@ -106,16 +106,16 @@ class _MesLocationsCdt extends State<MesLocationsCdt> {
           future: listLocation,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerSimpleVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MesLocationsCdt()))
               );
             }
             if(initListLocation.length==0) {
               return Center(
-                  child: Text("Aucune demande de location trouvée", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucune demande de location trouvé")
               );
             }
             if(snapshot.hasData) {
@@ -141,7 +141,7 @@ class _MesLocationsCdt extends State<MesLocationsCdt> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerSimpleVertical(10);
           },
         ),
       ),

@@ -5,6 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet_field.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 import 'package:niovarjobs/model/Categorie.dart';
 import 'package:niovarjobs/model/Experience.dart';
 import 'package:niovarjobs/model/Inscrire.dart';
@@ -26,9 +31,9 @@ class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
   late FToast fToast;
   late Inscrire inscrire;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  bool _showLoading = true;
+  bool _showLoading = true, isLoading =false;
 
-  String idCat="",  sexe="", annee="";
+  String listIdCatSelected="",  sexe="", annee="";
   late String  telephone="";
   bool validateNumber=false;
   late  final TextEditingController nom ;
@@ -63,15 +68,18 @@ class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
   List<String> listCategorieLibelle=["Aucun choix"];
   List<String> listExperienceLibelle=["Aucun choix"];
 
+  late List<Types> _selectedCategorie = [];
+
+  List<Types> _selectedCategorieInitValue = [];
 
 
-  Future EditInfos(var id, var idCat, var nom, var sexe, var email, var tel, var description, var nomRepre, var prenomRepre,  var profession, var telRepre) async {
+  Future EditInfos(var id, var listIdCatSelected, var nom, var sexe, var email, var tel, var description, var nomRepre, var prenomRepre,  var profession, var telRepre) async {
 
     Dio dio = new Dio();
     final String pathUrl = Constante.serveurAdress+"RestUser/Edit";
     FormData formData = new FormData.fromMap({
       'id': id,
-      'categorie': idCat,
+      'categorie': listIdCatSelected,
       'nom': nom,
       'sexe': sexe,
       'email_prof': email,
@@ -143,8 +151,10 @@ class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
         listCategorieData=listModel.toList();
 
         if(inscrire.categorie.isNotEmpty){
-          categorie= listModel.where((element) => element.id==int.parse(inscrire.categorie)).first.libelle;
-          idCat=inscrire.categorie;
+           inscrire.categorie.toString().split(",").forEach((item) {
+             _selectedCategorieInitValue.add(listModel.where((element) => element.id==int.parse(item)).first);
+           });
+           listIdCatSelected=inscrire.categorie;
         }
       }
 
@@ -205,10 +215,10 @@ class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
 
                   if (!_showLoading) ...[
                     Text(
-                      "Choisir votre catégorie ou domaine d'activité de votre compagnie",
+                      "Choisir les catégories ou domaine d'activité de votre compagnie",
                       style: Constante.style4,
                     ),
-                    SelectCategorie(),
+                    MultiSelectCategorie(),
 
                     SizedBox(height:size.height*0.02),
                     Text("Nom de la compagnie", style: Constante.style4,),
@@ -409,7 +419,7 @@ class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
 
 
 
-  SelectCategorie(){
+  /*SelectCategorie(){
 
     return Container(
       decoration: BoxDecoration(
@@ -468,6 +478,37 @@ class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
         ),
       ),
     );
+  }*/
+
+  MultiSelectCategorie(){
+return MultiSelectBottomSheetField(
+//  items: listCategorieData.map((e) => MultiSelectItem(e, e.libelle)).toList(),
+  items: listCategorieData.map((e) => MultiSelectItem<Types>(e, e.libelle))
+      .toList(),
+ initialValue: _selectedCategorieInitValue.toList(),
+  validator: (values) {
+    if (values == null || values.isEmpty) {
+      return "Veuillez choisir au moins une catégorie";
+    }
+
+    if (values.length>4) {
+      return "Impossible de selectionnez plus de 4 catégories";
+    }
+    return null;
+  },
+  listType: MultiSelectListType.CHIP,
+    cancelText: Text("Annuler"),
+  confirmText: Text("Terminer"),
+  title:Text("Cliquer ici pour selectionner"),
+    searchable:true,
+    searchHint: "Selectionner",
+  onConfirm: (values) {
+    setState(() {
+      _selectedCategorie= values.cast<Types>().toList();
+    });
+
+  },
+);
   }
 
   selectedSexe(){
@@ -647,41 +688,52 @@ class _Personnal_infos_Clt extends State<Personnal_infos_Clt> {
     return  InkWell(
       onTap: () async{
         if(formKey.currentState!.validate()){
-          Constante.showAlert(context, "Veuillez patientez", "Sauvegarde en cour...", SizedBox(), 100);
-          await EditInfos(session.id,idCat, nom.text, sexe, email.text,telephone,description.text,nomRepre.text, prenomRepres.text,profession.text,numRepres.text).then((value){
-            if(value['result_code'].toString().contains("1")){
-              Navigator.pop(context);
-              Constante.showToastSuccess("Sauvegarde éffectué avec succès ",fToast);
+          setState(() {
+            isLoading = true;
+          });
+          listIdCatSelected="";
+          _selectedCategorie.forEach((element) {
+            listIdCatSelected+=element.id.toString()+",";
+          });
+        listIdCatSelected = listIdCatSelected.substring(0, listIdCatSelected.length - 1);
 
+          await EditInfos(session.id,listIdCatSelected, nom.text, sexe, email.text,telephone,description.text,nomRepre.text, prenomRepres.text,profession.text,numRepres.text).then((value){
+            setState(() {
+              isLoading = false;
+            });
+            if(value['result_code'].toString().contains("1")){
+              Constante.showToastSuccess("Sauvegarde éffectué avec succès ",fToast);
             }else{
-              Navigator.pop(context);
-              Constante.showAlert(context, "Note d'information", value['message'].toString(),
-                  SizedBox(
-                    child: RaisedButton(
-                      padding: EdgeInsets.all(10),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        "Fermer",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      color:Colors.orange,
-                    ),
-                  ),
-                  170);
+              Constante.AlertMessageFromRequest(context,value['message'].toString());
             }
 
           }
-          );
+          ).catchError((error){
+            setState(() {
+              isLoading=false;
+              Constante.AlertInternetNotFound(context);
+            });
+          });
         }else{
           Constante.showToastError("Veuillez remplir les champs obligatoire ", fToast);
         }
       },
       child: Container(
           margin: EdgeInsets.symmetric(horizontal: 10),
-          child:
-          Icon(Icons.check, color: Colors.green,)
+          child: (isLoading)
+              ? MaterialButton(
+              minWidth: 20,
+              height: 20,
+              onPressed: () {  },
+              child:const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.orange,
+                    strokeWidth: 1.5,
+                  ))
+          )
+              : Icon(Icons.check, color: Colors.green,)
       ),
 
     );

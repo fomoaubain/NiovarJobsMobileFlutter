@@ -40,6 +40,10 @@ class Job
   var dateFin;
   var dateFinOffre;
   var immediatLabel;
+  var email_orther;
+  var instantane;
+  var horaireTravail;
+  var typeRemuneration;
 
 
   Categorie categorie;
@@ -97,7 +101,12 @@ class Job
     required this.typeOffre,
     required   this.lisDiplome,
     required   this.avantageSociauxJob,
-    required   this.immediatLabel
+    required   this.immediatLabel,
+
+    required   this.email_orther,
+    required   this.instantane,
+    required   this.horaireTravail,
+    required   this.typeRemuneration
 });
 
   factory Job.fromJson(Map<String, dynamic> json) {
@@ -153,7 +162,10 @@ class Job
       dateFin: json['dateFin'],
       niveauEcrire: json['niveauEcrire'],
       immediatLabel: json['immediatLabel'],
-
+      email_orther: json['email_orther'],
+      instantane: json['instantane'],
+      horaireTravail: json['HoraireTravail'],
+      typeRemuneration: json['TypeRemuneration'],
 
     );
   }

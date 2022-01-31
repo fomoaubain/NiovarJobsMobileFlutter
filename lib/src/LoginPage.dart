@@ -1,3 +1,4 @@
+
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:niovarjobs/model/Inscrire.dart';
 import 'package:niovarjobs/src/CreateUser.dart';
 import 'package:niovarjobs/src/VerifyEmailPage.dart';
 import 'package:niovarjobs/src/homePage.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Constante.dart';
@@ -22,14 +24,12 @@ class _LoginPage extends State<LoginPage>  {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late String  email;
   final TextEditingController pwd = TextEditingController();
-
-
+  bool isLoading = false;
 
   @override
  void initState()  {
     super.initState();
   }
-
 
   Future Login( String email,  String pwd) async{
     Dio dio = new Dio();
@@ -42,7 +42,6 @@ class _LoginPage extends State<LoginPage>  {
     var response = await dio.post(pathUrl,
       data: await formData,
     );
-
     return response.data;
   }
 
@@ -87,10 +86,12 @@ class _LoginPage extends State<LoginPage>  {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        FadeAnimation(1, Text("Se connecter", style: TextStyle(
+                        FadeAnimation(1,
+                            Text("Se connecter", style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold
-                        ),)),
+                        ),)
+                        ),
                         SizedBox(height: 20,),
                         FadeAnimation(1, Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -209,10 +210,14 @@ class _LoginPage extends State<LoginPage>  {
                           onPressed: () async{
                             if(formKey.currentState!.validate()){
                               print("Token : "+ session.fcmToken);
-                              Constante.showAlert(context, "Veuillez patientez", "Connexion en cour...", SizedBox(), 100);
+                              setState(() {
+                                isLoading=true;
+                              });
                               await Login( email, pwd.text).then((value) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
                                 if(value['result_code'].toString()=="1"){
-                                  Navigator.pop(context);
                                   Inscrire inscrire = Inscrire.fromJson(value['user']);
                                   final SharedPreferences prefs = await SharedPreferences.getInstance();
                                   if(inscrire!=null){
@@ -220,10 +225,9 @@ class _LoginPage extends State<LoginPage>  {
                                     prefs.setString('id', inscrire.id.toString());
                                     prefs.setString('email', inscrire.email);
                                     prefs.setString('type', inscrire.type);
+                                    prefs.setString('token', value['token'] != null ? value['token']:"ras");
                                     prefs.setString('profil', inscrire.type=="client" ? inscrire.profilCompagnie: inscrire.profilName);
                                   }
-
-                                // Navigator.push(context, MaterialPageRoute(builder: (context) => homePage(title: "")));
 
                                   Navigator.pushAndRemoveUntil(
                                       context,
@@ -233,25 +237,15 @@ class _LoginPage extends State<LoginPage>  {
                                       ModalRoute.withName("/Home")
                                   );
                                 }else{
-                                  Navigator.pop(context);
-                                  Constante.showAlert(context, "Note d'information !", value['message'].toString(),
-                                      SizedBox(
-                                        child: RaisedButton(
-                                          padding: EdgeInsets.all(10),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text(
-                                            "Fermer",
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                          color:Colors.redAccent,
-                                        ),
-                                      ),
-                                      150);
+                                  Constante.AlertMessageFromRequest(context,value['message'].toString());
                                 }
-                              }
-                              );
+                              }).catchError((error){
+                                print(error.toString());
+                                setState(() {
+                                  isLoading=false;
+                                  Constante.AlertInternetNotFound(context);
+                                });
+                              });
                             }else{
                               print("unsuccefully");
                             }
@@ -261,7 +255,15 @@ class _LoginPage extends State<LoginPage>  {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0)
                           ),
-                          child: Text("Se connecter", style: TextStyle(
+                          child: (isLoading)
+                              ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 1.5,
+                              ))
+                              :  Text("Se connecter", style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 18,
                               color: Colors.white
@@ -269,9 +271,9 @@ class _LoginPage extends State<LoginPage>  {
                         ),
                       ),
                     )),
-                    FadeAnimation(1, Text("Continuer avec les reseaux sociaux", style: TextStyle(color: Colors.grey),)),
+                   // FadeAnimation(1, Text("Continuer avec les réseaux sociaux", style: TextStyle(color: Colors.grey),)),
 
-                    Padding(padding: EdgeInsets.symmetric(horizontal: 50),
+                    /*Padding(padding: EdgeInsets.symmetric(horizontal: 50),
                       child: Row(
                         children: <Widget>[
                           Expanded(
@@ -287,7 +289,7 @@ class _LoginPage extends State<LoginPage>  {
                           ),
                         ],
                       ),
-                    ),
+                    ),*/
 
                   ],
                 ),

@@ -112,7 +112,7 @@ class _ListJob extends State<ListJob> {
           future: listOffreRecent,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
@@ -147,7 +147,7 @@ class _ListJob extends State<ListJob> {
                         margin: new EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
                         child: Container(
                           decoration: BoxDecoration(color: Colors.white),
-                          child:makeListTile(nDataList),
+                          child: Constante.makeListTileJob(context, nDataList),
                         ),
                       ),
                     );
@@ -155,7 +155,7 @@ class _ListJob extends State<ListJob> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerVertical(10);
           },
         ),
       ),
@@ -240,7 +240,7 @@ class _ListJob extends State<ListJob> {
                     ),
                   ),
 
-                  Constante.makeVedette(postuler.job),
+                  Constante.makeJobUgentOrInstantane(postuler.job),
                 ],
               ),
 

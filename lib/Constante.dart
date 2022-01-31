@@ -1,21 +1,30 @@
 
+import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/model/Postuler.dart';
+import 'package:niovarjobs/src/DetailsJob.dart';
 import 'package:niovarjobs/src/homePage.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'model/Job.dart';
  class Constante
 {
-  //static String  serveurAdress = "https://www.niovarjobs.com/";
-  //static String  serveurAdress = "http://192.168.43.63:3000/";
- static String  serveurAdress = "http://192.168.0.103:3000/";
+  static String  serveurAdress = "https://www.niovarjobs.com/";
+// static String  serveurAdress = "http://192.168.43.63:3000/";
+//static String  serveurAdress = "http://192.168.100.110:3000/";
+ // static String  serveurAdress = "https://niovar.solutions/";
 
  static String  token = "LYo32?Z";
  static String  typeClient = "client";
  static String  typeCandidat = "candidat";
+  static Future<void>? _launched;
+
 
   static const kBlack = Color(0xFF21202A);
   static const kBlackAccent = Color(0xFF3A3A3A);
@@ -51,12 +60,39 @@ import 'model/Job.dart';
     color: kBlack,
   );
 
-  static Text makeVedette(Job job){
+  static Widget makeJobUgentOrInstantane(Job job){
     String val = '';
-    if(job.vedette.contains("1")){
+    Color colors= Colors.transparent;
+    if(job.vedette=="1"){
       val='En vedette';
+      colors= Colors.blue.shade400;
     }
-    return Text(val, style: TextStyle(color: Colors.green[300], fontWeight: FontWeight.bold, fontSize: 12.0));
+    if(job.instantane==1){
+      val='Urgente';
+      colors= Colors.green.shade400;
+    }
+    return val.isNotEmpty ? Container(
+        height: 18,
+        margin: EdgeInsets.symmetric(vertical: 2),
+        padding: EdgeInsets.all(2),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            color: colors
+        ),
+        child: Text.rich(
+          TextSpan(
+            style: TextStyle(color: Colors.white, fontSize: 10),
+            children: [
+              TextSpan(
+                text: val,
+              ),
+            ],
+          ),
+        )
+
+    ) : SizedBox();
+    return Text(val, style: TextStyle(color: colors, fontWeight: FontWeight.bold, fontSize: 12.0));
+
   }
 
   static Column circularLoader(){
@@ -309,6 +345,75 @@ import 'model/Job.dart';
     );
   }
 
+ static Widget ShimmerVertical(int itemNumber){
+   return Shimmer.fromColors(
+       child: ListView.builder(
+           itemCount: itemNumber,
+           scrollDirection: Axis.vertical,
+           shrinkWrap: true,
+           physics: ScrollPhysics(),
+           itemBuilder: (context,i){
+             return ListTile(
+               leading: Icon(Icons.image, size: 50,),
+               title: SizedBox(
+                 height: 40,
+                 child: Container(
+                   color: Colors.grey,
+
+                 ),
+               ),
+             );
+           }
+       ),
+     baseColor: Colors.grey[300]!,
+     highlightColor: Colors.grey[100]!,
+   );
+ }
+
+ static Widget ShimmerHorizontal(int itemNumber){
+   return Shimmer.fromColors(
+     child: ListView.builder(
+         itemCount: itemNumber,
+         scrollDirection: Axis.horizontal,
+         shrinkWrap: true,
+         physics: BouncingScrollPhysics(),
+         itemBuilder: (context,i){
+           return Card(
+             elevation: 1.0,
+             shape: RoundedRectangleBorder(
+               borderRadius: BorderRadius.circular(16),
+             ),
+             child: const SizedBox(height: 20, width: 150,),
+           );
+         }
+     ),
+     baseColor: Colors.grey[300]!,
+     highlightColor: Colors.grey[100]!,
+   );
+ }
+
+
+ static Widget ShimmerSimpleVertical(int itemNumber){
+   return Shimmer.fromColors(
+     child: ListView.builder(
+         itemCount: itemNumber,
+         scrollDirection: Axis.vertical,
+         shrinkWrap: true,
+         physics: ScrollPhysics(),
+         itemBuilder: (context,i){
+           return Card(
+             elevation: 1.0,
+             shape: RoundedRectangleBorder(
+               borderRadius: BorderRadius.circular(16),
+             ),
+             child: const SizedBox(height: 50),
+           );
+         }
+     ),
+     baseColor: Colors.grey[300]!,
+     highlightColor: Colors.grey[100]!,
+   );
+ }
 
   //create this function, so that, you needn't to configure toast every time
 static  void showToastMessage(String message){
@@ -392,14 +497,14 @@ static  void showToastMessage(String message){
              style: GoogleFonts.openSans(
                textStyle: TextStyle(
                  color: Colors.black45,
-                 fontSize: 18,
+                 fontSize: 16,
                  fontWeight: FontWeight.w600,
                ),
              ),
            ),
          ),
 
-         SizedBox(height: 5),
+         SizedBox(height: 2),
          Container(
            alignment: Alignment.center,
            padding: EdgeInsets.symmetric(horizontal: 10),
@@ -409,50 +514,26 @@ static  void showToastMessage(String message){
              style: GoogleFonts.openSans(
                textStyle: TextStyle(
                  color: Colors.black45,
-                 fontSize: 10,
+                 fontSize: 9,
                  fontWeight: FontWeight.w600,
                ),
              ),
              textAlign: TextAlign.center,
            ),
          ),
-
-
          SizedBox(height: 10),
-
-         Card(
-             elevation: 10,
-             shape: RoundedRectangleBorder(
-               borderRadius: BorderRadius.circular(15),
-             ),
-             color: Colors.orange,
-             child: InkWell( onTap: ()  {
+         InkWell(
+             onTap: ()  {
                Navigator.pop(context);
                Navigator.push(context, route);
              },
-               child: Container(
-                 height: 50,
-                 width:200,
-                 child: Center(
-                   child: Text(
-                     "Réessayer",
-                     style: TextStyle(
-                         fontWeight: FontWeight.w500,
-                         fontSize: 16,
-                         color: Colors.white
-                     ),
-                   ),
-                 ),
-               ),
-               borderRadius: BorderRadius.circular(10),
-             )
+           child: Icon(Icons.refresh, size: 40, color: Colors.grey,)
          ),
          SizedBox(height: 15),
        ],
      ),
    );
  }
-
 
  static  Widget layoutDataNotFound( String text){
    return Container(
@@ -469,7 +550,7 @@ static  void showToastMessage(String message){
              style: GoogleFonts.openSans(
                textStyle: TextStyle(
                  color: Colors.black45,
-                 fontSize: 18,
+                 fontSize: 16,
                  fontWeight: FontWeight.w600,
                ),
              ),
@@ -479,5 +560,284 @@ static  void showToastMessage(String message){
      ),
    );
  }
+
+ static Future<void> launchInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: true,
+        headers: <String, String>{'my_header_key': 'my_header_value'},
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  static void showSnackBarMessage(BuildContext context, String text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+          content:Text(text),
+          backgroundColor: Colors.black87,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+        )
+    );
+
+  }
+
+
+  static void showAlertRedirectWebSite(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+            borderRadius:
+            BorderRadius.circular(20.0)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Container(
+            height: 300,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.orange.withOpacity(.5)),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      "Note d'information",
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                          color: Colors.green,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 5),
+                  Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child:
+                    Text(
+                      "Afin de béneficier de tous les services et fonctionnalitées et un meilleur management de votre compte employeur/client que vous offres NiovarJobs, "
+                          "veuillez cliquer sur le  lien ci-dessous afin de vous connectez sur la notre plateforme et accéder a toutes les options qui vous sont offertes.",
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                          color: Colors.black45,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+
+                  SizedBox(height: 10),
+
+                  Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      color: Colors.orange,
+                      child: InkWell( onTap: () async {
+                        _launched = launchInBrowser(url);
+                      },
+                        child: Container(
+                          margin: EdgeInsets.all(5),
+                          height: 50,
+                          width:300,
+                          child: Center(
+                            child: Text(
+                              "Continuer sur NiovarJobs.com",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16,
+                                  color: Colors.white
+                              ),
+                            ),
+                          ),
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                  ),
+                  SizedBox(height: 15),
+                ],
+              ),
+            ),
+
+          ),
+
+
+
+
+        ),
+      ),
+    );
+  }
+
+ static  Future<bool?> AlertInternetNotFound( BuildContext context){
+    return Alert(
+      context: context,
+      type: AlertType.error,
+      title: "Oups !",
+      desc: "Problème de connexion au serveur. Veuillez verifier votre connexion internet",
+      buttons: [
+        DialogButton(
+            child: Text(
+              "fermer",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            width: 120
+        )
+      ],
+    ).show();
  }
+
+ static  Future<bool?> AlertMessageFromRequest( BuildContext context, String message){
+   return Alert(
+     context: context,
+     type: AlertType.warning,
+     desc: message,
+     buttons: [
+       DialogButton(
+           child: Text(
+             "fermer",
+             style: TextStyle(color: Colors.white, fontSize: 20),
+           ),
+           onPressed: () => Navigator.pop(context),
+           width: 120
+       )
+     ],
+   ).show();
+ }
+
+  static  Future<bool?> AlertLoadingWithMessage( BuildContext context){
+    return Alert(
+      context: context,
+      type: AlertType.none,
+      desc: "Veuillez patientez...",
+      buttons: [
+        DialogButton(
+          color: Colors.white,
+          child: SizedBox(
+            height: 35,
+            width: 35,
+            child: CircularProgressIndicator(
+              color: Colors.orange,
+              strokeWidth: 1.5,
+            ),
+          ),
+          onPressed: () => Navigator.pop(context),
+          width: 120,
+        )
+      ],
+
+    ).show();
+  }
+
+ static ListTile makeListTileJob(BuildContext context, Postuler postuler) => ListTile(
+   contentPadding:
+   EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+   leading: Container(
+     decoration: new BoxDecoration(
+         border: new Border(
+             right: new BorderSide(width: 1.0, color: Colors.white24))),
+     child: Card(
+       child: CachedNetworkImage(
+
+         width: 60.0,
+         imageUrl: Constante.serveurAdress+postuler.inscrire.profilName,
+         placeholder: (context, url) => CupertinoActivityIndicator(),
+         errorWidget: (context, url, error) => Icon(Icons.error),
+       ),
+     ),
+   ),
+   title: Text(
+     postuler.job.titre,
+     style: TextStyle(color: Colors.orange[700], fontWeight: FontWeight.bold, fontSize: 16.0),
+   ),
+   subtitle: Row(
+     children: <Widget>[
+       Expanded(
+           flex: 12,
+           child: Container(
+             child : Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                 Text.rich(
+                   TextSpan(
+                     style: TextStyle(
+                         fontSize: 14,
+                         color: Colors.black54,
+                         fontWeight: FontWeight.bold
+                     ),
+                     children: [
+
+                       TextSpan(
+                         text: Constante.getSalaire(postuler.job),
+                       )
+                     ],
+                   ),
+                 ),
+                 Text.rich(
+                   TextSpan(
+                     style: TextStyle(
+                         fontSize: 10,
+                         color: Colors.black54
+                     ),
+                     children: [
+                       WidgetSpan(
+                         child: Icon(Icons.location_on,color:Colors.black45, size: 14.0,),
+                       ),
+                       TextSpan(
+                         text: postuler.job.pays+", "+ postuler.job.province +", "+postuler.job.ville,
+                       )
+                     ],
+                   ),
+                 ),
+                 Text.rich(
+                   TextSpan(
+                     style: TextStyle(
+                         fontSize: 10,
+                         color: Colors.black54
+                     ),
+                     children: [
+                       WidgetSpan(
+                         child: Icon(Icons.calendar_today,color:Colors.black45, size: 14.0,),
+                       ),
+                       TextSpan(
+                         text: "Publié le : "+postuler.job.created,
+                       )
+                     ],
+                   ),
+                 ),
+                 Constante.makeJobUgentOrInstantane(postuler.job),
+               ],
+             ),
+           )),
+     ],
+   ),
+   trailing:
+   Icon(Icons.keyboard_arrow_right, color: Colors.orange[700], size: 30.0),
+   onTap: () {
+     Navigator.push(
+         context, MaterialPageRoute(builder: (context) => DetailsJob( idJob: postuler.job.id,forVisit: false,)));
+   },
+ );
+
+ }
+
+
 

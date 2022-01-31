@@ -14,19 +14,19 @@ import '../Constante.dart';
 import 'DetailsJob.dart';
 
 class ResultatPage extends StatefulWidget {
-  var idCat, idEmploi, annexp, timeWork, vedette, hour, lieu, titre;
+  var idCat, urgent, annexp, horaireTravail, vedette, hour, lieu, titre;
   ResultatPage({
      this.idCat,
-     this.idEmploi,
+     this.urgent,
      this.annexp,
-     this.timeWork,
+     this.horaireTravail,
      this.vedette,
      this.hour,
      this.lieu,
   this.titre});
 
   @override
-  _ResultatPage createState() => _ResultatPage(idCat, idEmploi, annexp, timeWork, vedette, hour, lieu, titre);
+  _ResultatPage createState() => _ResultatPage(idCat, urgent, annexp, horaireTravail, vedette, hour, lieu, titre);
 }
 
 class _ResultatPage extends State<ResultatPage> {
@@ -34,23 +34,23 @@ class _ResultatPage extends State<ResultatPage> {
   late List<Postuler> objJob=[],  initListJob=[];
   late Future<List<Postuler>>  listOffreRecent;
   var loading = false;
-  var idCat, idEmploi, annexp, timeWork, vedette, hour, lieu, titre;
+  var idCat, urgent, annexp, horaireTravail, vedette, hour, lieu, titre;
 
 
-  _ResultatPage(this.idCat, this.idEmploi, this.annexp, this.timeWork, this.vedette, this.hour, this.lieu, this.titre);
+  _ResultatPage(this.idCat, this.urgent, this.annexp, this.horaireTravail, this.vedette, this.hour, this.lieu, this.titre);
 
-  Future<List<Postuler>> fetchItem(var idCat, var idEmploi, var annexp, var timeWork, var vedette, var hour, var lieu,  var titre) async {
+  Future<List<Postuler>> fetchItem(var idCat, var urgent, var annexp, var horaireTravail, var vedette, var hour, var lieu,  var titre) async {
     List<Postuler> listModel = [];
     final String pathUrl = Constante.serveurAdress+"RestJob/ListEmploiFiltre";
     Map<String, String> queryParams = {
       'anneeExp': annexp,
       'locationSearch': lieu,
       'libelleSearch': titre,
-      'categoriesSearch': idEmploi,
+      'urgent': urgent,
       'domaine': idCat,
       'timePost': hour,
       'vedetteChech': vedette,
-      'type': timeWork,
+      'horaireTravail': horaireTravail,
     };
     String queryString = Uri(queryParameters: queryParams).query;
     var requestUrl = pathUrl + '?' + queryString;
@@ -74,7 +74,7 @@ class _ResultatPage extends State<ResultatPage> {
   void initState() {
     super.initState();
     setState(() {
-      listOffreRecent= this.fetchItem(this.idCat, this.idEmploi, this.annexp, this.timeWork, this.vedette, this.hour, this.lieu, this.titre);
+      listOffreRecent= this.fetchItem(this.idCat, this.urgent, this.annexp, this.horaireTravail, this.vedette, this.hour, this.lieu, this.titre);
     });
 
     _scrollController.addListener(_onScroll);
@@ -126,7 +126,7 @@ class _ResultatPage extends State<ResultatPage> {
           future: listOffreRecent,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
@@ -169,7 +169,7 @@ class _ResultatPage extends State<ResultatPage> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerVertical(10);
           },
         ),
       ),
@@ -254,7 +254,7 @@ class _ResultatPage extends State<ResultatPage> {
                     ),
                   ),
 
-                  Constante.makeVedette(postuler.job),
+                  Constante.makeJobUgentOrInstantane(postuler.job),
                 ],
               ),
 

@@ -6,20 +6,30 @@ import 'package:niovarjobs/model/Job.dart';
 import 'package:niovarjobs/model/Postuler.dart';
 
 class DescriptionTab extends StatelessWidget {
+
   final Postuler postuler;
   DescriptionTab({required this.postuler});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: ListView(
         children: <Widget>[
+          SizedBox(height: 20,),
           Container(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildButtonColumn( Icons.monetization_on_sharp, Constante.getSalaire(postuler.job)),
-               // _buildButtonColumn( Icons.info, postuler.job.heureTravail),
-                _buildButtonColumn( Icons.work, postuler.job.margeExperience),
+                Expanded(
+                    child: Center(
+                      child:_buildButtonColumn2( Icons.monetization_on_sharp,Constante.getSalaire(postuler.job), "Salaire",  Colors.black45, 15 ),
+                    )
+                ),
+                Expanded(
+                    child: Center(
+                      child: _buildButtonColumn2( Icons.work,postuler.job.margeExperience, "Expérience",  Colors.black45, 15 ),
+                    )
+                ),
+
               ],
             ),
           ),
@@ -32,25 +42,25 @@ class DescriptionTab extends StatelessWidget {
           SizedBox(height: 10.0),
         textSection(postuler.job.description),
           SizedBox(height: 15.0),
-          Text(
+          postuler.job.instantane== 1 ? SizedBox() : Text(
             "Responsabilitees",
             style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10.0),
-          textSection(postuler.job.responsabilite),
+          postuler.job.instantane== 1 ? SizedBox() :textSection(postuler.job.responsabilite),
           SizedBox(height: 15.0),
-          Text(
+          postuler.job.instantane== 1 ? SizedBox() :Text(
             "Exigences et competences",
             style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10.0),
-          textSection(postuler.job.exigence),
+          postuler.job.instantane== 1 ? SizedBox() : textSection(postuler.job.exigence),
           SizedBox(height: 15,),
-          Text(
+          postuler.job.instantane== 1 ? SizedBox() : Text(
             "Diplomes necessaires",
             style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.bold),
           ),
-          Column(
+          postuler.job.instantane== 1 ? SizedBox() : Column(
             children: postuler.job.lisDiplome
                 .map(
                   (e) => Row(
@@ -81,11 +91,11 @@ class DescriptionTab extends StatelessWidget {
                 .toList(),
           ),
           SizedBox(height: 15,),
-          Text(
+          postuler.job.instantane== 1 ? SizedBox() : Text(
             "Avantages sociaux",
             style: Constante.kTitleStyle.copyWith(fontWeight: FontWeight.bold),
           ),
-          Column(
+          postuler.job.instantane== 1 ? SizedBox() : Column(
             children: postuler.job.avantageSociauxJob
                 .map(
                   (e) => Row(
@@ -118,15 +128,10 @@ class DescriptionTab extends StatelessWidget {
           ),
           SizedBox(height: 10,),
           ShowEQuiteEmploi(postuler.job),
-
-
-
-
         ],
       ),
     );
   }
-
 
 
   Widget textSection(String text){
@@ -176,6 +181,45 @@ class DescriptionTab extends StatelessWidget {
       );
     }
     return   SizedBox();
+  }
+
+  Column _buildButtonColumn2(IconData icon, String label, String text, Color color, double size) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextwithIcon(icon, text, color, size),
+        Container(
+          margin: const EdgeInsets.only(top:0, left: 10, right: 10),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.black45,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Text TextwithIcon(IconData icon, String text, Color colors, double textsize){
+    return  Text.rich(
+      TextSpan(
+        style: TextStyle(
+            fontSize: textsize,
+            color: colors
+        ),
+        children: [
+          WidgetSpan(
+            child: Icon(icon,color:Colors.orange, size: 14.0,),
+          ),
+          TextSpan(
+            text: text,
+          )
+        ],
+      ),
+    );
   }
 
 

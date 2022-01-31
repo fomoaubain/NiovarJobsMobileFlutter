@@ -8,6 +8,7 @@ import 'package:niovarjobs/model/Postuler.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:niovarjobs/src/CodeVerificationPage.dart';
 import 'package:niovarjobs/src/LoginPage.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 
 class form_candidat extends StatefulWidget {
@@ -28,6 +29,7 @@ class _form_candidat extends State<form_candidat> {
 
   final TextEditingController pwd = TextEditingController();
   final TextEditingController confirm_pwd = TextEditingController();
+  bool isLoading = false;
 
   Future CreateCompte(String name, String email, String telephone, String pwd, String type ) async{
     Dio dio = new Dio();
@@ -205,7 +207,7 @@ class _form_candidat extends State<form_candidat> {
                                   return "maximum 10 caracteres";
                                 }
                                 if(!RegExp(r"^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_]))[A-Za-z0-9!@#$%^&*()_]{8,10}$").hasMatch(value)){
-                                  return "minimum 8 caracteres, 1 majuscule, 1 minuscule et 1 chiffre numerique";
+                                  return "minimum 8 caractères, 1 majuscule, 1 minuscule et 1 chiffre numerique";
                                 }
                                 return null;
                               },
@@ -263,36 +265,28 @@ class _form_candidat extends State<form_candidat> {
                               minWidth: double.infinity,
                               height: 60,
                               onPressed: () async {
-
                                 if(formKey.currentState!.validate()){
-                                  Constante.showAlert(context, "Veuillez patientez", "Creation de votre compte en cour...", SizedBox(), 100);
+                                  setState(() {
+                                    isLoading=true;
+                                  });
                                   await CreateCompte(name, email, telephone, pwd.text, Constante.typeCandidat).then((value){
+                                    setState(() {
+                                      isLoading = false;
+                                    });
                                     if(value['result_code'].toString()=="1"){
                                       String code=value['code'].toString();
-                                      Navigator.pop(context);
                                       Navigator.push(
                                           context, MaterialPageRoute(builder: (context) => CodeVerificationPage(email, code, false)));
                                     }else{
-                                      Navigator.pop(context);
-                                      Constante.showAlert(context, "Alerte !", value['message'].toString(),
-                                          SizedBox(
-                                            child: RaisedButton(
-                                              padding: EdgeInsets.all(10),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text(
-                                                "Fermer",
-                                                style: TextStyle(color: Colors.white),
-                                              ),
-                                              color:Colors.redAccent,
-                                            ),
-                                          ),
-                                          170);
+                                      Constante.AlertMessageFromRequest(context,value['message'].toString());
                                     }
-
                                   }
-                                  );
+                                  ).catchError((error){
+                                    setState(() {
+                                      isLoading=false;
+                                      Constante.AlertInternetNotFound(context);
+                                    });
+                                  });
 
                                 }else{
                                   print("unsuccefully");
@@ -303,7 +297,15 @@ class _form_candidat extends State<form_candidat> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12.0)
                               ),
-                              child: Text("Creer mon compte", style: TextStyle(
+                              child: (isLoading)
+                                  ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 1.5,
+                                  ))
+                                  :  Text("Creer mon compte", style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 18,
                                   color: Colors.white

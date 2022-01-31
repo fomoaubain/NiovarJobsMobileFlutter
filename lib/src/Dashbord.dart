@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:niovarjobs/Global.dart' as session;
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:niovarjobs/src/GridDashboardClient.dart';
 import 'package:niovarjobs/src/profil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -94,7 +95,8 @@ class _Dashbord extends State<Dashbord> {
           ),
           SizedBox(height: 20),
           //TODO Grid Dashboard
-          session.type.toString()=="client" ? layoutForWebSite() :  GridDashboard(),
+          session.type.toString()=="client" ? GridDashboardClient() :  GridDashboard(),
+          SizedBox(height: 10),
 
 
         ],
@@ -194,7 +196,7 @@ class _Dashbord extends State<Dashbord> {
               ),
               color: Colors.orange,
               child: InkWell( onTap: () async {
-                _launched = _launchInBrowser("https://niovarjobs.com/Inscrires/Login");
+                _launched = Constante.launchInBrowser("https://niovarjobs.com/Inscrires/Login");
               },
                 child: Container(
                   height: 50,
@@ -219,17 +221,6 @@ class _Dashbord extends State<Dashbord> {
     );
   }
 
-  Future<void> _launchInBrowser(String url) async {
-    if (await canLaunch(url)) {
-      await launch(
-        url,
-        forceSafariVC: false,
-        forceWebView: true,
-        headers: <String, String>{'my_header_key': 'my_header_value'},
-      );
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+
 }
 

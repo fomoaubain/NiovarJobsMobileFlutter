@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
+//import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -109,16 +109,17 @@ class _MesAffectations extends State<MesAffectations> {
           future: listAffections,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerSimpleVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MesAffectations()))
+
               );
             }
             if(initListAffections.length==0) {
               return Center(
-                  child: Text("Aucune lettre d'affectation trouvée", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucune lettre d'affectation trouvée")
               );
             }
             if(snapshot.hasData) {
@@ -143,7 +144,7 @@ class _MesAffectations extends State<MesAffectations> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerSimpleVertical(10);
           },
         ),
       ),

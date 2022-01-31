@@ -3,45 +3,45 @@ import 'dart:convert';
 class Inscrire
 {
   int id;
-  String  type;
-  String nom;
-  String login;
-  String email ;
-  String password ;
-  String phone ;
-  String website ;
-  String description ;
-  String facebook ;
-  String linkedin ;
-  String pays;
-  String ville;
-  String adresse;
-  String titreEmploi;
-  String anneeExperience;
-  String salaireSouhaiter;
-  String salaireNegocier;
-String profil;
+  var  type;
+  var nom;
+  var login;
+  var email ;
+  var password ;
+  var phone ;
+  var website ;
+  var description ;
+  var facebook ;
+  var linkedin ;
+  var pays;
+  var ville;
+  var adresse;
+  var titreEmploi;
+  var anneeExperience;
+  var salaireSouhaiter;
+  var salaireNegocier;
+  var profil;
 
 
-String emailProf;
-String categorie;
-String domaine;
-String codePostal;
-String nomRepresentant;
-String prenomRepresentant;
-String numeroPoste;
-String province;
+  var emailProf;
+  var categorie;
+  var domaine;
+  var codePostal;
+  var nomRepresentant;
+  var prenomRepresentant;
+  var numeroPoste;
+  var province;
 
 
-  String titreRepresentant;
-String telRepresentant;
-String fcmToken;
+  var titreRepresentant;
+  var telRepresentant;
+  var fcmToken;
 
-String employeStatus;
-String sexe;
-String profilCompagnie;
+  var employeStatus;
+  var sexe;
+  var profilCompagnie;
 
-String profilName;
+  var profilName;
 var libelleTitreEmploi;
 
 var NbrePost;
@@ -49,39 +49,39 @@ var NbrePost;
 
   Inscrire({
      required this.id,
-    required this.type,
-    required this.nom,
-    required this.login,
-    required this.email,
-    required this.password,
-    required  this.phone,
-    required this.website,
-    required this.description,
-    required this.facebook,
-    required this.linkedin,
-    required this.pays,
-    required this.ville,
-    required this.adresse,
-    required this.titreEmploi,
-    required  this.anneeExperience,
-    required  this.salaireSouhaiter,
-    required this.salaireNegocier,
-    required this.profil,
-    required this.emailProf,
-    required this.categorie,
-    required this.domaine,
-    required this.codePostal,
-    required this.nomRepresentant,
-    required this.prenomRepresentant,
-    required this.numeroPoste,
-    required this.province,
-    required this.titreRepresentant,
-    required this.telRepresentant,
-    required this.fcmToken,
-    required this.employeStatus,
-    required  this.sexe,
-    required  this.profilCompagnie,
-    required  this.profilName,
+     this.type,
+     this.nom,
+     this.login,
+     this.email,
+     this.password,
+      this.phone,
+     this.website,
+     this.description,
+     this.facebook,
+     this.linkedin,
+     this.pays,
+     this.ville,
+     this.adresse,
+     this.titreEmploi,
+      this.anneeExperience,
+      this.salaireSouhaiter,
+     this.salaireNegocier,
+     this.profil,
+     this.emailProf,
+     this.categorie,
+     this.domaine,
+     this.codePostal,
+     this.nomRepresentant,
+     this.prenomRepresentant,
+     this.numeroPoste,
+     this.province,
+     this.titreRepresentant,
+     this.telRepresentant,
+     this.fcmToken,
+     this.employeStatus,
+      this.sexe,
+      this.profilCompagnie,
+      this.profilName,
       this.NbrePost,
     this.libelleTitreEmploi
 
@@ -96,40 +96,36 @@ var NbrePost;
       email: json['email'],
       description: json['description'],
       password: json['password'],
-      phone:json['phone'].toString(),
-      website: json['website'].toString(),
-      facebook: json['facebook'].toString(),
-      linkedin: json['linkedin'].toString(),
-      pays: json['pays'].toString(),
+      phone:json['phone'],
+      website: json['website'],
+      facebook: json['facebook'],
+      linkedin: json['linkedin'],
+      pays: json['pays'],
       province: json['province'],
       ville: json['ville'],
-      adresse: json['adresse'].toString(),
+      adresse: json['adresse'],
       titreEmploi: json['titreEmploi'],
-      anneeExperience: json['anneeExperience'].toString(),
-      salaireSouhaiter: json['salaireSouhaiter'].toString(),
-      salaireNegocier: json['salaireNegocier'].toString(),
+      anneeExperience: json['anneeExperience'] ,
+      salaireSouhaiter: json['salaireSouhaiter'],
+      salaireNegocier: json['salaireNegocier'],
 
       nomRepresentant: json['nom_representant'],
       profil: json['profilName'],
       emailProf: json['email_prof'],
-      telRepresentant: json['tel_representant'].toString(),
-      codePostal: json['code_postal'].toString(),
-      numeroPoste: json['numero_poste'].toString(),
+      telRepresentant: json['tel_representant'],
+      codePostal: json['code_postal'],
+      numeroPoste: json['numero_poste'],
       titreRepresentant: json['titre_representant'],
       prenomRepresentant: json['prenom_representant'],
       sexe: json['sexe'],
-      domaine: json['domaine'].toString(),
-      employeStatus: json['employeStatus'].toString(),
-      fcmToken: json['salaireNegocier'].toString(),
-      categorie: json['categorie'].toString(),
-      profilCompagnie: json['profilCompagnie'].toString(),
-      profilName: json['profilName'].toString(),
-      NbrePost: json['NbrePost'].toString(),
+      domaine: json['domaine'],
+      employeStatus: json['employeStatus'],
+      fcmToken: json['salaireNegocier'],
+      categorie: json['categorie'],
+      profilCompagnie: json['profilCompagnie'],
+      profilName: json['profilName'],
+      NbrePost: json['NbrePost'],
       libelleTitreEmploi: json['libelleTitreEmploi'],
-
-
-
-
     );
   }
 

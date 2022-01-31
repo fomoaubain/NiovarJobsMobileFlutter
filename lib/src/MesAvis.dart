@@ -90,16 +90,17 @@ class _MesAvis extends State<MesAvis> {
               future: listAvis,
               builder: (context, snapshot) {
                 if(snapshot.connectionState != ConnectionState.done) {
-                  return Constante.circularLoader();
+                  return Constante.ShimmerSimpleVertical(10);
                 }
                 if(snapshot.hasError) {
                   return Center(
-                      child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                      child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MesAvis(widget.idIns, widget.pages)))
+
                   );
                 }
                 if(initListAvis.length==0) {
                   return Center(
-                      child: Text("Aucun avis trouvée", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                      child: Constante.layoutDataNotFound("Aucun avis trouvée")
                   );
                 }
                 if(snapshot.hasData) {
@@ -124,7 +125,7 @@ class _MesAvis extends State<MesAvis> {
                   );
                 }
                 // By default, show a loading spinner.
-                return Constante.circularLoader();
+                return Constante.ShimmerSimpleVertical(10);
               },
             ),
           ),

@@ -41,6 +41,7 @@ class _Localisation_infos extends State<Localisation_infos> {
   late String cityValue;
 
    String pays="", province="", ville="";
+   bool isLoading =false;
 
 
   Future<Inscrire> fetchItem() async {
@@ -276,41 +277,43 @@ class _Localisation_infos extends State<Localisation_infos> {
     return  InkWell(
       onTap: () async{
         if(formKey.currentState!.validate()){
-          Constante.showAlert(context, "Veuillez patientez", "Sauvegarde en cour...", SizedBox(), 100);
+          setState(() {isLoading= true;});
+
           await EditInfos(session.id,adresse.text, codePostal.text, pays, province, ville).then((value){
-            print(countryValue.toString());
+            setState(() {isLoading= false;});
             if(value['result_code'].toString().contains("1")){
               pays=""; province=""; ville=""; countryValue =""; stateValue=""; cityValue="";
-              Navigator.pop(context);
               Constante.showToastSuccess("Sauvegarde éffectué avec succès ",fToast);
             }else{
-              Navigator.pop(context);
-              Constante.showAlert(context, "Note d'information", value['message'].toString(),
-                  SizedBox(
-                    child: RaisedButton(
-                      padding: EdgeInsets.all(10),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        "Fermer",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      color:Colors.orange,
-                    ),
-                  ),
-                  170);
+              Constante.AlertMessageFromRequest(context,value['message'].toString());
             }
           }
-          );
+          ).catchError((error){
+            setState(() {
+              isLoading=false;
+              Constante.AlertInternetNotFound(context);
+            });
+          });
         }else{
           Constante.showToastError("Veuillez remplir les champs obligatoire ", fToast);
         }
       },
       child: Container(
           margin: EdgeInsets.symmetric(horizontal: 10),
-          child:
-          Icon(Icons.check, color: Colors.green,)
+          child: (isLoading)
+              ? MaterialButton(
+              minWidth: 20,
+              height: 20,
+              onPressed: () {  },
+              child:const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.orange,
+                    strokeWidth: 1.5,
+                  ))
+          )
+              : Icon(Icons.check, color: Colors.green,)
       ),
 
     );

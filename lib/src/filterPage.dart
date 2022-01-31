@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:custom_radio_grouped_button/CustomButtons/ButtonTextStyle.dart';
-import 'package:custom_radio_grouped_button/CustomButtons/CustomRadioButton.dart';
+
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +11,7 @@ import 'package:group_button/group_button.dart';
 import 'package:niovarjobs/Global.dart';
 import 'package:niovarjobs/model/Categorie.dart';
 import 'package:niovarjobs/model/Experience.dart';
+import 'package:niovarjobs/model/HoraireTravail.dart';
 import 'package:niovarjobs/model/Type.dart';
 import 'package:niovarjobs/widget/filter_pressed-Button.dart';
 import 'package:niovarjobs/widget/group_Buttons.dart';
@@ -23,14 +24,13 @@ import '../Constante.dart';
 import 'ResultatPage.dart';
 
 class FilterPage extends StatefulWidget {
-
   @override
   _FilterPage createState() => _FilterPage();
 }
 
 class _FilterPage extends State<FilterPage> {
 
-  String idCat="", idEmploi="", annexp="", timeWork="", vedette="", hour="";
+  String idCat="", idEmploi="", annexp="", horaireTravail="", vedette="", hour="", urgent="";
 
   final TextEditingController lieu = TextEditingController();
 
@@ -39,12 +39,13 @@ class _FilterPage extends State<FilterPage> {
   String dateAffichage = 'Aucun choix';
   String titreEmploi="Aucun choix";
   String S3 = 'Aucun choix';
-  late String categorie='Aucun choix';
+  late String selectCategorie='Aucun choix';
 
   late Future<List<Types>> listCategorie;
   late List<Types> listCategorieData=[];
   late List<Categorie> listTitreEmploi=[];
   late List<Experience> listExperience=[];
+  late List<HoraireTravail> listHoraireTravail=[];
 
   late int idCategorie;
   List<String> listCategorieId=[];
@@ -55,6 +56,7 @@ class _FilterPage extends State<FilterPage> {
    Future<List<Types>> fetchItem(String urlApi) async {
      List<Types> listModel = [];
      List<Experience> listModelExperience = [];
+     List<HoraireTravail> listModelHoraireTravail= [];
      final response = await http.get(Uri.parse(Constante.serveurAdress+urlApi));
      if (response.statusCode == 200) {
        final data = jsonDecode(response.body)['datas'];
@@ -66,7 +68,6 @@ class _FilterPage extends State<FilterPage> {
      }
 
      final responseExperience = await http.get(Uri.parse(Constante.serveurAdress+"RestJob/GetAllAnneeExp"));
-
      if (responseExperience.statusCode == 200) {
        final data = jsonDecode(responseExperience.body)['datas'];
        if (data != null) {
@@ -76,7 +77,18 @@ class _FilterPage extends State<FilterPage> {
        }
      }
 
+     final responseHoraireTravail = await http.get(Uri.parse(Constante.serveurAdress+"RestJob/GetAllHoraireTravail"));
+     if (responseHoraireTravail.statusCode == 200) {
+       final data = jsonDecode(responseHoraireTravail.body)['datas'];
+       if (data != null) {
+         data.forEach((element) {
+           listModelHoraireTravail.add(HoraireTravail.fromJson(element));
+         });
+       }
+     }
+
      setState(() {
+       listHoraireTravail =listModelHoraireTravail.toList();
        listExperience = listModelExperience.toList();
        listCategorieId.add("Aucun choix");
        listModel.forEach((element) {
@@ -175,14 +187,16 @@ class _FilterPage extends State<FilterPage> {
                       "Categorie",
                       style: Constante.style4,
                     ),
+                    SizedBox(height: size.height*0.01,),
                     SelectCategorie(),
                     SizedBox(height:size.height*0.02),
                     Text(
-                      "Titre d'emploi",
+                      "Offres urgentes",
                       style: Constante.style4,
                     ),
-                    SelectTitreEmploi(),
-                    SizedBox(height:size.height*0.02),
+                    SizedBox(height: size.height*0.01,),
+                    groupButtonsUrgente(context),
+                    SizedBox(height: size.height*0.01,),
                     Text(
                       "Ville ou lieu",
                       style: Constante.style4,
@@ -213,10 +227,10 @@ class _FilterPage extends State<FilterPage> {
                     groupButtonsExperience(context),
                     SizedBox(height: size.height*0.03,),
                     Text(
-                      "Temps de travail",
+                      "Horaire de travail",
                       style: Constante.style4,
                     ),
-                    SelectTempTravail(),
+                    groupButtonsHoraireTravail(context),
                     SizedBox(height: size.height*0.02,),
 
                     Text(
@@ -262,12 +276,12 @@ class _FilterPage extends State<FilterPage> {
                       Navigator.push(
                           context, MaterialPageRoute(builder: (context) => ResultatPage(
                         lieu: lieu.text,
+                        urgent: urgent,
                         annexp: annexp,
-                        timeWork: timeWork,
+                        horaireTravail: horaireTravail,
                         vedette: vedette,
                         hour: hour,
                         idCat: idCat,
-                        idEmploi: idEmploi,
                       )));
                     },
                     color: Colors.orange[700],
@@ -291,7 +305,7 @@ class _FilterPage extends State<FilterPage> {
 
   }
 
-   SelectTitreEmploi(){
+   /*SelectTitreEmploi(){
      return Container(
        decoration: BoxDecoration(
          borderRadius: BorderRadius.circular(15),
@@ -339,9 +353,38 @@ class _FilterPage extends State<FilterPage> {
          ),
        ),
      );
-   }
+   }*/
 
-   SelectCategorie(){
+  SelectCategorie(){
+   return DropdownSearch<String>(
+        dropdownSearchDecoration: InputDecoration(
+          hintText: "Sélectionnez la catégorie",
+          contentPadding: EdgeInsets.fromLTRB(12, 5, 0, 0),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(width: 1, color: Constante.kBlack.withOpacity(0.2)),
+            borderRadius: BorderRadius.circular(10.0)
+          ),
+        ),
+        mode: Mode.MENU,
+        items: listCategorieLibelle,
+        validator: (v) => v == null ? "required field" : null,
+        showSearchBox: true,
+        onChanged: (newValue){
+          listCategorieData.forEach((element){
+            if(newValue== element.libelle){
+              newValue = element.libelle;
+              idCat=element.id.toString();
+            }
+          });
+          setState(() {
+            selectCategorie = newValue!;
+          });
+        },
+        selectedItem: selectCategorie);
+
+  }
+
+   /*SelectCategorie(){
      return Container(
        decoration: BoxDecoration(
          borderRadius: BorderRadius.circular(15),
@@ -425,7 +468,7 @@ class _FilterPage extends State<FilterPage> {
        ),
      );
    }
-
+*/
 
   Widget groupButtonsExperience(BuildContext context){
  final  List<String> listId=[];
@@ -446,6 +489,48 @@ class _FilterPage extends State<FilterPage> {
         onSelected: (index, isSelected){
           annexp= listLibelle.elementAt(index).toString();
 
+        },
+        buttons: listLibelle,
+        selectedTextStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+          color: Colors.orange,
+        ),
+        unselectedTextStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+          color: Colors.grey[600],
+        ),
+        selectedColor: Colors.white,
+        unselectedColor: Colors.grey[300],
+        selectedBorderColor: Colors.orange,
+        unselectedBorderColor: Colors.grey[500],
+        borderRadius: BorderRadius.circular(10.0),
+        selectedShadow: <BoxShadow>[BoxShadow(color: Colors.transparent)],
+        unselectedShadow: <BoxShadow>[BoxShadow(color: Colors.transparent)],
+      ),
+    );
+
+  }
+
+  Widget groupButtonsHoraireTravail(BuildContext context){
+    final  List<String> listId=[];
+    final  List<String> listLibelle=[];
+
+    listHoraireTravail.forEach((element) {
+      listId.add(element.id.toString());
+      listLibelle.add(element.libelle.toString());
+    });
+
+    return Padding(padding: const EdgeInsets.all(2),
+      child: GroupButton(
+        crossGroupAlignment: CrossGroupAlignment.start,
+        spacing: 2,
+        isRadio: true,
+        direction: Axis.horizontal,
+        onSelected: (index, isSelected){
+         // horaireTravail= listLibelle.elementAt(index).toString();
+          horaireTravail= listId.elementAt(index).toString();
         },
         buttons: listLibelle,
         selectedTextStyle: TextStyle(
@@ -509,8 +594,46 @@ class _FilterPage extends State<FilterPage> {
 
 
   }
+  Widget groupButtonsUrgente(BuildContext context){
+    final  List<String> listId=['','1', '0'];
+    return Padding(padding: const EdgeInsets.all(4),
+      child: GroupButton(
+        crossGroupAlignment: CrossGroupAlignment.start,
+        spacing: 2,
+        isRadio: true,
+        direction: Axis.horizontal,
+        onSelected: (index, isSelected){
+          urgent= listId.elementAt(index).toString();
+        },
+        buttons: [
+          'Aucun choix',
+          'Oui',
+          'Non',
+        ],
+        selectedTextStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+          color: Colors.orange,
+        ),
+        unselectedTextStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+          color: Colors.grey[600],
+        ),
+        selectedColor: Colors.white,
+        unselectedColor: Colors.grey[300],
+        selectedBorderColor: Colors.orange,
+        unselectedBorderColor: Colors.grey[500],
+        borderRadius: BorderRadius.circular(10.0),
+        selectedShadow: <BoxShadow>[BoxShadow(color: Colors.transparent)],
+        unselectedShadow: <BoxShadow>[BoxShadow(color: Colors.transparent)],
+      ),
+    );
 
-  SelectTempTravail(){
+
+  }
+
+  /*SelectTempTravail(){
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
@@ -559,7 +682,7 @@ class _FilterPage extends State<FilterPage> {
         ),
       ),
     );
-  }
+  }*/
 
   SelectDateAffichage(){
     return Container(

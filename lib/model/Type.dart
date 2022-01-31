@@ -11,7 +11,6 @@ class Types
     required this.id, this.libelle, this.name, this.image, this.status});
 
   factory Types.fromJson(Map<String, dynamic> json) {
-
     return Types(
       id: json['id'],
       libelle: json['libelle'],
@@ -23,3 +22,4 @@ class Types
   }
 
 }
+

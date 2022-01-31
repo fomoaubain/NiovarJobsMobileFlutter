@@ -23,6 +23,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:niovarjobs/src/LoginPage.dart';
 import 'package:niovarjobs/src/ResultatPage.dart';
+import 'package:niovarjobs/src/ShimmerEffectState.dart';
 import 'package:niovarjobs/src/filterPage.dart';
 import 'package:niovarjobs/src/notificationPage.dart';
 import 'package:niovarjobs/src/profil.dart';
@@ -31,6 +32,7 @@ import 'package:niovarjobs/widget/company_card.dart';
 import 'package:niovarjobs/widget/company_card2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:niovarjobs/Global.dart' as session;
+import 'package:shimmer/shimmer.dart';
 import 'Dashbord.dart';
 import 'drawer/drawer_header.dart';
 import 'package:http/http.dart' as http;
@@ -38,18 +40,52 @@ import 'package:badges/badges.dart';
 
 class homePage extends StatefulWidget {
   homePage({ Key? key,  required this.title}) : super(key: key);
-
   final String title;
-
   @override
   _homePageState createState() => _homePageState();
 
 }
 
+/*Future<String> testToken() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  var token = prefs.containsKey('token') ? prefs.getString('token') : "";
+  print("test token "+token.toString());
+  final response = await http.post(Uri.parse(Constante.serveurAdress+"Api/test1"),
+      headers: {
+    "Authorization": "Bearer $token"
+      }
+  );
+  if (response.statusCode == 200) {
+    final data =response.body;
+    print("Authorization " +data.toString());
+    return data;
+  }
+  return "";
+}
+
+Future<String> testToken2() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  var token = prefs.containsKey('token') ? prefs.getString('token') : "";
+  print("test token "+token.toString());
+  final response = await http.post(Uri.parse(Constante.serveurAdress+"Api/test2"),
+      headers: {
+        "Authorization": "Bearer $token"
+      });
+  if (response.statusCode == 200) {
+    final data =response.body;
+    print("Authorization " +data.toString());
+    return data;
+  }
+  return "";
+}*/
+
 class _homePageState extends  State<homePage> with SingleTickerProviderStateMixin{
   late FToast fToast;
   late TabController _controller;
   late final FirebaseMessaging _messaging;
+  Future<void>? _launched;
+
+  bool showSectionCompagnie= true;
 
   late Future<List<Postuler>>  listOffreVedette;
   late Future<List<Postuler>>  listOffreRecent;
@@ -59,7 +95,6 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
   late List<Inscrire> initListInscrire=[], objInscrire=[];
   var currentPage = DrawerSections.home;
   int _currentMax=4;
-  late var nbreNotif=0;
 
   bool isLoggedIn = false;
 
@@ -87,7 +122,6 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
     if(val == 2){
       initListJob2=  listModel.take(6).toList();
     }
-
     return listModel.take(10).toList();
   }
 
@@ -97,14 +131,11 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
       final data = jsonDecode(response.body)['count'];
       if (data != null) {
         setState(() {
-          nbreNotif = data;
-
+          session.nbreNotif = data;
         });
       }
     }
   }
-
-
 
   Future<List<Inscrire>> fetchItemInscire(String urlApi) async {
     List<Inscrire> listModel = [];
@@ -119,6 +150,11 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
     }
 
     initListInscrire = listModel;
+    if(initListInscrire.length==0) {
+      setState(() {
+        showSectionCompagnie=false;
+      });
+    }
     return listModel.take(6).toList();
   }
 
@@ -242,42 +278,43 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                   ],
                 ),
               ),
-              SizedBox(height: 35.0),
-              Row(
-                children: [
-                  Expanded(child:
-                  Text(
-                    "Compagnies recommandées",
-                    style: Constante.kTitleStyle,
-                  ),
-                  ),
-                  Container(
-                      padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) => ListCompagnie()));
-                        },
-                        child: Text(
-                          "Voir plus",
-                          style: Constante.kTitleStyle,
-                        ),
-                      )
-                  ),
+              if (showSectionCompagnie) ...[
+               SizedBox(height: 35.0),
+               Row(
+                  children: [
+                    Expanded(child:
+                    Text(
+                      "Compagnies recommandées",
+                      style: Constante.kTitleStyle,
+                    ),
+                    ),
+                    Container(
+                        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => ListCompagnie()));
+                          },
+                          child: Text(
+                            "Voir plus",
+                            style: Constante.kTitleStyle,
+                          ),
+                        )
+                    ),
 
-                ],
-              ),
+                  ],
+                ),
+                SizedBox(height: 15.0),
+              ],
 
-              SizedBox(height: 15.0),
               Container(
                 width: double.infinity,
-                height: 190.0,
+                height: showSectionCompagnie ? 190.0 : 0.0,
                 child:FutureBuilder<List<Inscrire>>(
                   future: listCompagnie,
                   builder: (context, snapshot) {
                     if(snapshot.connectionState != ConnectionState.done) {
-                      return Constante.circularLoader();
-
+                      return Constante.ShimmerHorizontal(6);
                     }
                     if(snapshot.hasError) {
                       return Center(
@@ -285,9 +322,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                       );
                     }
                     if(initListInscrire.length==0) {
-                      return Center(
-                          child: Constante.layoutDataNotFound("Aucune compagnie disponible")
-                      );
+                      return SizedBox();
                     }
                     if(snapshot.hasData) {
                       if(objInscrire.length==0){
@@ -295,7 +330,6 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                       }else{
                         objInscrire = objInscrire.toList();
                       }
-
                       return ListView.builder(
                           controller: _scrollController3,
                           itemCount: loading ? objInscrire.length + 1 : objInscrire.length,
@@ -327,12 +361,11 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                       );
                     }
                     // By default, show a loading spinner.
-                    return Constante.circularLoader();
+                    return  Constante.ShimmerHorizontal(6);
                   },
                 ),
               ),
               SizedBox(height: 35.0),
-
               Row(
                 children: [
                   Expanded(child:
@@ -364,7 +397,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                   future: listOffreRecent,
                   builder: (context, snapshot) {
                     if(snapshot.connectionState != ConnectionState.done) {
-                      return Constante.circularLoader();
+                      return Constante.ShimmerVertical(10);
 
                     }
                     if(snapshot.hasError) {
@@ -407,7 +440,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                                           right: new BorderSide(width: 1.0, color: Colors.white24),
                                       )
                                   ),
-                                  child: makeListTile(nDataList),
+                                  child: Constante.makeListTileJob(context, nDataList),
                                 ),
                               ),
                             );
@@ -415,10 +448,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
                       );
                     }
                     // By default, show a loading spinner.
-                    return Container(
-                      padding: EdgeInsets.only(top: 20.0),
-                      child: Constante.circularLoader(),
-                    );
+                    return Constante.ShimmerVertical(10);
 
                   },
                 ),
@@ -438,93 +468,14 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
             return;
           }else{
             if(session.type.isNotEmpty && session.type=="client"){
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Veuillez vous connectez avec un compte candidat pour envoyer votre cv'),
-                  backgroundColor: Colors.black87,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                )
-              );
-
+              showAlertPopupMenu(context);
             }else{
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => UploadCv()));
             }
-
           }
-
         },
-        child: Icon(Icons.note_add),
-      ),
-    );
-  }
-
-  Widget MyDrawerList(){
-    return Container(
-      padding: EdgeInsets.only(top: 15),
-      child: Column(
-        children: [
-          menuItem(1,'Accueil',Icons.home, currentPage==DrawerSections.home ? true :false),
-          menuItem(2,'Mes abonnements',Icons.monetization_on_sharp, currentPage==DrawerSections.abonnements ? true :false),
-          Divider(),
-          menuItem(3,'Comment sa marche',Icons.help, currentPage==DrawerSections.faqPage ? true :false),
-          menuItem(4,'Contact',Icons.phone, currentPage==DrawerSections.contact ? true :false),
-          Divider(),
-          menuItem(5,'Se connecter',Icons.login, currentPage==DrawerSections.logIn ? true :false),
-          menuItem(6,'Se deconnecter',Icons.logout, currentPage==DrawerSections.logOut ? true :false),
-        ],
-      ),
-    );
-  }
-
-  Widget menuItem(int id, String title, IconData icon, bool selected){
-    return Material(
-      color: selected ? Colors.grey[300] : Colors.transparent,
-      child: InkWell(
-        onTap: (){
-          Navigator.pop(context);
-          setState(() {
-            if(id==1){ currentPage=DrawerSections.home; }
-            else if(id==2){ currentPage=DrawerSections.abonnements;
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => homePage(title: "title")));
-            }
-            else if(id==3){ currentPage=DrawerSections.faqPage; }
-            else if(id==4){ currentPage=DrawerSections.contact; }
-            else if(id==5){ currentPage=DrawerSections.logIn; }
-            else if(id==6){ currentPage=DrawerSections.logOut; }
-
-          });
-        },
-        child:  Padding(
-          padding:  EdgeInsets.all(15.0),
-          child: Row(
-            children: [
-              Expanded(child: Icon(icon, size: 20,color: Colors.black,)),
-              Expanded(flex: 3, child: Text(title,  style: TextStyle(color: Colors.black, fontSize: 16), ))
-            ],
-          ),
-        ),
-
-      ),
-    );
-  }
-
-  Widget menuTabItem(int id, String title, IconData icon){
-    return Text.rich(
-      TextSpan(
-        style: TextStyle(
-            fontSize: 16,
-            color: Colors.black87
-        ),
-        children: [
-          WidgetSpan(
-            child: Icon(icon,color:Colors.black87 , ),
-          ),
-          TextSpan(
-            text: title,
-          )
-        ],
+        child: session.type.isNotEmpty && session.type=="client" ? Icon(Icons.post_add) : Icon(Icons.note_add),
       ),
     );
   }
@@ -543,7 +494,6 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
             color: Constante.kBlack,
           ),
         ),
-
     );
   }
 
@@ -578,11 +528,20 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
       margin: EdgeInsets.only(top: 5),
       child: InkWell(
         onTap:  () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => NotificationPage()));
+           Navigator.of(context)
+               .push(MaterialPageRoute(
+             builder: (context) => NotificationPage(),
+           ))
+               .then((value) {
+             // you can do what you need here
+             setState(() {
+               session.nbreNotif= session.nbreNotif;
+             });
+
+           });
         },
         child: Badge(
-          badgeContent: Text(nbreNotif.toString(), style: TextStyle(color: Colors.white),),
+          badgeContent: Text(session.nbreNotif.toString(), style: TextStyle(color: Colors.white),),
           badgeColor: Colors.green,
           child: Icon(Icons.notifications, size: 25,),
         ),
@@ -640,99 +599,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
 
   }
 
-   ListTile makeListTile(Postuler postuler) => ListTile(
-    contentPadding:
-    EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-    leading: Container(
-      decoration: new BoxDecoration(
-          border: new Border(
-              right: new BorderSide(width: 1.0, color: Colors.white24))),
-      child: Card(
-        child: CachedNetworkImage(
 
-          width: 60.0,
-          imageUrl: Constante.serveurAdress+postuler.inscrire.profilName,
-          placeholder: (context, url) => CupertinoActivityIndicator(),
-          errorWidget: (context, url, error) => Icon(Icons.error),
-        ),
-      ),
-    ),
-    title: Text(
-      postuler.job.titre,
-      style: TextStyle(color: Colors.orange[700], fontWeight: FontWeight.bold, fontSize: 16.0),
-    ),
-    subtitle: Row(
-      children: <Widget>[
-        Expanded(
-            flex: 12,
-            child: Container(
-              child : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                        fontWeight: FontWeight.bold
-                      ),
-                      children: [
-
-                        TextSpan(
-                          text: Constante.getSalaire(postuler.job),
-                        )
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.black54
-                      ),
-                      children: [
-                        WidgetSpan(
-                          child: Icon(Icons.location_on,color:Colors.black45, size: 14.0,),
-                        ),
-                        TextSpan(
-                          text: postuler.job.pays+", "+ postuler.job.province +", "+postuler.job.ville,
-                        )
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.black54
-                      ),
-                      children: [
-                        WidgetSpan(
-                          child: Icon(Icons.calendar_today,color:Colors.black45, size: 14.0,),
-                        ),
-                        TextSpan(
-                          text: "Publié le : "+postuler.job.created,
-                        )
-                      ],
-                    ),
-                  ),
-
-                 Constante.makeVedette(postuler.job),
-                ],
-              ),
-
-            )),
-
-
-      ],
-    ),
-    trailing:
-    Icon(Icons.keyboard_arrow_right, color: Colors.orange[700], size: 30.0),
-    onTap: () {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => DetailsJob( idJob: postuler.job.id,forVisit: false,)));
-    },
-  );
 
   @override
   void initState() {
@@ -743,6 +610,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
 
     loadFirebaseNotification();
     checkUserConnect();
+
 
     listOffreVedette= this.fetchItem('RestJob/listoffrevedette',2);
 
@@ -757,9 +625,18 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
 
  void loadFirebaseNotification() async {
     FirebaseMessaging.instance.getInitialMessage().then((message){
-      if(message!=null){
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => homePage(title: "")));
+      if(message!.notification!=null){
+        setState(() {
+          if(message.data["type"].toString().contains("single") ){
+            session.nbreNotif=session.nbreNotif+1;
+          }
+        });
+        if(message.data["id"].toString().isNotEmpty ){
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => DetailsJob(idJob: message.data["id"].toString(),forVisit: false,)));
+        }else{
+          Navigator.pushNamed(context, "/notification");
+        }
       }
     });
     _messaging = FirebaseMessaging.instance;
@@ -787,7 +664,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
 
           setState(() {
             if(message.data["type"].toString().contains("single") ){
-              nbreNotif=nbreNotif+1;
+              session.nbreNotif=session.nbreNotif+1;
             }
           });
 
@@ -800,11 +677,20 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print("route  ok pour onMessageOpenApp");
-        setState(() {
-          nbreNotif=nbreNotif+1;
-        });
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => homePage(title: "")));
+        if(message.notification!=null){
+          setState(() {
+            if(message.data["type"].toString().contains("single") ){
+              session.nbreNotif=session.nbreNotif+1;
+            }
+          });
+            if(message.data["id"].toString().isNotEmpty ){
+              session.nbreNotif=session.nbreNotif+1;
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => DetailsJob(idJob: message.data["id"].toString(),forVisit: false,)));
+            }else{
+              Navigator.pushNamed(context, "/notification");
+            }
+        }
       });
     } else {
       print('User declined or has not accepted permission');
@@ -819,6 +705,7 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
     session.login  = prefs.getString('login')!;
     session.id  = prefs.getString('id')!;
     session.type  = prefs.getString('type')!;
+    session.token  = prefs.getString('token')!;
 
     setState(() {
       if(!session.id.isEmpty){
@@ -830,12 +717,8 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
     if(session.id.isNotEmpty){
       String topic="user"+session.id.toString();
       _messaging.subscribeToTopic(topic.toString());
-
       GetNbreNotification();
     }
-    
-
-
   }
 
   _onScroll(){
@@ -894,6 +777,79 @@ class _homePageState extends  State<homePage> with SingleTickerProviderStateMixi
       objInscrire = initListInscrire.take(objInscrire.length+6).toList();
       loading = false;
     });
+  }
+
+ void showAlertPopupMenu(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+            borderRadius:
+            BorderRadius.circular(20.0)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Container (
+            height: 500,
+            child: SingleChildScrollView(
+
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text("Main d'oeuvre", style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black87),
+                    ),
+                  ),
+                  Divider(),
+                  AlertMenuItem("Demander main d'oeuvre", Icons.add,
+                  ),
+                  Divider(),
+                  AlertMenuItem("Publier une offre d'emploi", Icons.add,
+                  ),
+                  Divider(),
+                  AlertMenuItem("Louer un employé", Icons.add,
+                  ),
+                  Divider(),
+                  AlertMenuItem("Banque de CV", Icons.add,
+                  ),
+                  Divider(),
+                  AlertMenuItem("Mettre une offre d'emploi en vedette", Icons.add,
+                  ),
+                  Divider(),
+                  AlertMenuItem("Devenir une entreprise recommandée", Icons.add,
+                  ),
+                  Divider(),
+
+                  SizedBox(height: 10,),
+
+                ],
+              ),
+            ),
+          ),
+
+
+
+
+        ),
+      ),
+    );
+  }
+
+  Widget AlertMenuItem(String title, IconData icon) {
+
+    return ListTile(
+      title: Text(title,  style: TextStyle(fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: Colors.black54),
+      ),
+      trailing:
+      Icon(Icons.keyboard_arrow_right, color: Colors.black45, size: 30.0),
+      onTap: () async {
+        Navigator.pop(context);
+        Constante.showAlertRedirectWebSite(context, "https://niovarjobs.com/Inscrires/Login");
+      },
+    );
+
   }
 
   @override

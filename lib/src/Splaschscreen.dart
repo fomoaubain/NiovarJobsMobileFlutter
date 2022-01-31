@@ -32,8 +32,6 @@ class _Splaschscreen extends  State<Splaschscreen>{
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -44,10 +42,10 @@ class _Splaschscreen extends  State<Splaschscreen>{
         children: <Widget>[
           Image.asset('assets/logo.png', height: 100.0),
           SizedBox(height: 10.0,),
-
           SpinKitRipple(
+            size: 20,
             color: Colors.orange,
-          )
+          ),
 
         ],
       ) ,

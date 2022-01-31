@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +19,12 @@ class EditPwd extends StatefulWidget {
 }
 
 class _EditPwd extends State<EditPwd> {
+  late FToast fToast;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController t1Controller = TextEditingController();
   TextEditingController pwd = TextEditingController();
   TextEditingController confirm_pwd = TextEditingController();
+ bool isLoading=false;
 
   Future editPassword(String id, String oldPassword, String pwd, String confirm_pwd) async{
     Dio dio = new Dio();
@@ -43,6 +46,8 @@ class _EditPwd extends State<EditPwd> {
   @override
   void initState() {
     super.initState();
+    fToast = FToast();
+    fToast.init(context);
 
   }
 
@@ -138,6 +143,9 @@ class _EditPwd extends State<EditPwd> {
                     if(value.length>10){
                       return "maximum 10 caracteres";
                     }
+                    if(value.toString() == t1Controller.text.toString()){
+                      return "Le nouveau mot de passe ne doit pas être identique a l'ancien mot de passe";
+                    }
                     if(!RegExp(r"^(?:(?=.*?[A-Z])(?:(?=.*?[0-9])(?=.*?[-!@#$%^&*()_])|(?=.*?[a-z])(?:(?=.*?[0-9])|(?=.*?[-!@#$%^&*()_])))|(?=.*?[a-z])(?=.*?[0-9])(?=.*?[-!@#$%^&*()_]))[A-Za-z0-9!@#$%^&*()_]{8,10}$").hasMatch(value)){
                       return "minimum 8 caracteres, 1 majuscule, 1 minuscule et 1 chiffre numerique";
                     }
@@ -200,11 +208,15 @@ class _EditPwd extends State<EditPwd> {
           color: Colors.orange,
           child: InkWell( onTap: () async {
             if(formKey.currentState!.validate()){
-              Constante.showAlert(context, "Veuillez patientez", "Mofidification du mot de passe en cour...", SizedBox(), 100);
+              setState(() {
+                isLoading=true;
+              });
               await editPassword(session.id,t1Controller.text,pwd.text,confirm_pwd.text).then((value) async {
+                setState(() {
+                  isLoading=false;
+                });
                 if(value['result_code'].toString().contains("1")){
-                  Navigator.pop(context);
-                  Constante.showAlert(context, "Note d'information", "Mot de passe modifier avec succès", SizedBox(), 100);
+                  Constante.showToastSuccess("Mot de passe modifier avec succès",fToast);
                   await new Future.delayed(new Duration(seconds: 2));
                   final SharedPreferences prefs = await SharedPreferences.getInstance();
                    prefs.clear();
@@ -216,24 +228,14 @@ class _EditPwd extends State<EditPwd> {
                       ModalRoute.withName("/Home")
                   );
                 }else{
-                  Navigator.pop(context);
-                  Constante.showAlert(context, "Note d'information", value['message'].toString(),
-                      SizedBox(
-                        child: RaisedButton(
-                          padding: EdgeInsets.all(10),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "Fermer",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          color:Colors.orange,
-                        ),
-                      ),
-                      170);
+                  Constante.AlertMessageFromRequest(context,value['message'].toString());
                 }
 
+              }).catchError((error){
+                setState(() {
+                  isLoading=false;
+                  Constante.AlertInternetNotFound(context);
+                });
               });
 
             }else{
@@ -244,7 +246,15 @@ class _EditPwd extends State<EditPwd> {
               height: 55,
               width: double.infinity,
               child: Center(
-                child: Text(text,style: Constante.kTitleStyle.copyWith(
+                child: (isLoading)
+                    ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 1.5,
+                    ))
+                    :Text(text,style: Constante.kTitleStyle.copyWith(
                     color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400

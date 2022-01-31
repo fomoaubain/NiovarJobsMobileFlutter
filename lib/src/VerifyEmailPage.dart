@@ -17,6 +17,7 @@ class _VerifyEmailPage extends State<VerifyEmailPage> {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController email = TextEditingController();
+ bool isLoading=false;
 
   Future VerifyEmail( String email) async{
     Dio dio = new Dio();
@@ -125,37 +126,28 @@ class _VerifyEmailPage extends State<VerifyEmailPage> {
           color: Colors.orange,
           child: InkWell( onTap: () async {
             if(formKey.currentState!.validate()){
-
-              Constante.showAlert(context, "Veuillez patientez", "Vérification du courriel en cour...", SizedBox(), 100);
+              setState(() {
+                isLoading=true;
+              });
               await VerifyEmail(email.text).then((value){
+                setState(() {
+                  isLoading=false;
+                });
                 if(value['result_code'].toString().contains("1")){
-                  Navigator.pop(context);
                   Navigator.pop(context);
                   String code=value['code'].toString();
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => CodeVerificationPage(email.text, code, true)));
-
                 }else{
-                  Navigator.pop(context);
-                  Constante.showAlert(context, "Note d'information", value['message'].toString(),
-                      SizedBox(
-                        child: RaisedButton(
-                          padding: EdgeInsets.all(10),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "Fermer",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          color:Colors.orange,
-                        ),
-                      ),
-                      170);
+                  Constante.AlertMessageFromRequest(context,value['message'].toString());
                 }
-
               }
-              );
+              ).catchError((error){
+                setState(() {
+                  isLoading=false;
+                  Constante.AlertInternetNotFound(context);
+                });
+              });
             }
 
           },
@@ -163,7 +155,15 @@ class _VerifyEmailPage extends State<VerifyEmailPage> {
               height: 55,
               width: double.infinity,
               child: Center(
-                child: Text(text,style: Constante.kTitleStyle.copyWith(
+                child:(isLoading)
+                    ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 1.5,
+                    ))
+                    :  Text(text,style: Constante.kTitleStyle.copyWith(
                     color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400

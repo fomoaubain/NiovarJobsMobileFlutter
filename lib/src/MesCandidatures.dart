@@ -59,7 +59,6 @@ class _MesCandidatures extends State<MesCandidatures> {
       });
       _fetchData();
     }
-
   }
 
   Future _fetchData() async {
@@ -109,16 +108,16 @@ class _MesCandidatures extends State<MesCandidatures> {
           future: listCandidatures,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerSimpleVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MesCandidatures()))
               );
             }
             if(initListCandidatures.length==0) {
               return Center(
-                  child: Text("Aucune candidature trouvée", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucune candidature trouvée")
               );
             }
             if(snapshot.hasData) {
@@ -187,8 +186,7 @@ class _MesCandidatures extends State<MesCandidatures> {
                       ),
                       child: IconButton(
                           onPressed: () {
-                            Navigator.push(
-                                context, MaterialPageRoute(builder: (context) => DetailsJob( idJob: item.job.id,forVisit: true,)));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsJob( idJob: item.job.id,forVisit: true,)));
                           },
                           icon: Icon(
                             Icons.remove_red_eye,
@@ -372,7 +370,7 @@ class _MesCandidatures extends State<MesCandidatures> {
   }
 
   void removeCandidature(Postuler postuler, int index, ) async {
-    Constante.showAlert(context, "Veuillez patientez", "Retrait de la demande en cour...", SizedBox(), 100);
+    Constante.AlertLoadingWithMessage(context);
     await retirerCandidature(postuler.id.toString()).then((value){
       if(value['result_code'].toString()=="1"){
         Navigator.pop(context);
@@ -380,7 +378,6 @@ class _MesCandidatures extends State<MesCandidatures> {
           objCandidatures.removeAt(index);
         });
         Constante.showToastSuccess("Candidature rétirer avec succès ",fToast);
-
       }else{
         Navigator.pop(context);
         Constante.showAlert(context, "Alerte !", value['message'].toString(),
@@ -401,7 +398,11 @@ class _MesCandidatures extends State<MesCandidatures> {
       }
 
     }
-    );
+    ).catchError((error){
+      setState(() {
+        Constante.AlertInternetNotFound(context);
+      });
+    });
 
   }
 

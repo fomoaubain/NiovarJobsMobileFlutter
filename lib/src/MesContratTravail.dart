@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
+//import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -110,16 +110,16 @@ class _MesContratTravail extends State<MesContratTravail> {
           future: listContratTravail,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerSimpleVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MesContratTravail()))
               );
             }
             if(initListContratTravail.length==0) {
               return Center(
-                  child: Text("Aucun contrat de travail trouvé", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucune contrat de travail trouvé")
               );
             }
             if(snapshot.hasData) {
@@ -144,7 +144,7 @@ class _MesContratTravail extends State<MesContratTravail> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerSimpleVertical(10);
           },
         ),
       ),

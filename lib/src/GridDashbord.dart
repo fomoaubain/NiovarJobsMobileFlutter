@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:niovarjobs/src/CvPage.dart';
+import 'package:niovarjobs/src/ManageAlerte.dart';
 import 'package:niovarjobs/src/MesAffectations.dart';
 import 'package:niovarjobs/src/MesCandidatures.dart';
 import 'package:niovarjobs/src/MesContratTravail.dart';
@@ -9,7 +10,6 @@ import 'package:niovarjobs/src/mesDocuments.dart';
 import 'package:niovarjobs/src/mesTalonPaie.dart';
 
 class GridDashboard extends StatelessWidget {
-
 
   Items item1 = new Items(
       id:1,
@@ -60,11 +60,18 @@ class GridDashboard extends StatelessWidget {
     event: "",
     img: "assets/contrat.png",
   );
+  Items item8 = new Items(
+    id:8,
+    title: "Alertes \n  emplois",
+    subtitle: "Configurer vos \n alertes",
+    event: "",
+    img: "assets/alerte.png",
+  );
 
 
   @override
   Widget build(BuildContext context) {
-    List<Items> myList = [item1, item2, item3, item4, item5, item6, item7];
+    List<Items> myList = [item1, item2, item3, item4, item5, item6, item7, item8];
     var color = 0xff453658;
     return Flexible(
       child: GridView.count(
@@ -106,61 +113,71 @@ class GridDashboard extends StatelessWidget {
                 Navigator.push(
                     context, MaterialPageRoute(builder: (context) => MesContratTravail()));
               }
+              if(data.id==8){
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => ManageAlerte()));
+              }
             },
-            child:  Container(
+            child:   Container(
+              padding: EdgeInsets.symmetric(vertical: 10,),
               decoration: BoxDecoration(
                 color: Color(0xFFF37B3E),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset(data.img, width: 40),
-                  SizedBox(height: 5),
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    alignment: Alignment.topCenter,
-                    child: Text(
-                      data.title,
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
+              child:SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(data.img, width: 40),
+                    SizedBox(height: 5),
 
-                  SizedBox(height: 2),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      data.subtitle,
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                          color: Colors.white38,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
+                    Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.all(5),
+                        child: Center(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                data.title,
+                                style: GoogleFonts.openSans(
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            )
 
-                  SizedBox(height: 5),
-                  Text(
-                    data.event,
-                    style: GoogleFonts.openSans(
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
+                        )
+
                     ),
-                  ),
-                ],
+
+                    SizedBox(height: 2),
+                    Container(
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child:Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            data.subtitle,
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(
+                                color: Colors.white38,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        )
+
+                    ),
+
+                  ],
+                ),
               ),
+
             ),
           );
 

@@ -80,16 +80,16 @@ class _MesOffresPages extends State<MesOffresPages> {
           future: listOffreRecent,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MesOffresPages(widget.idIns)))
               );
             }
             if(initListJob.length==0) {
               return Center(
-                  child: Text("Aucune offre d'emploi disponible", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucune offre d'emploi disponible")
               );
             }
             if(snapshot.hasData) {
@@ -123,7 +123,7 @@ class _MesOffresPages extends State<MesOffresPages> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerVertical(10);
           },
         ),
       ),
@@ -206,7 +206,7 @@ class _MesOffresPages extends State<MesOffresPages> {
                     ),
                   ),
 
-                  Constante.makeVedette(postuler.job),
+                  Constante.makeJobUgentOrInstantane(postuler.job),
                 ],
               ),
 

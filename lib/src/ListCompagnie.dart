@@ -101,7 +101,7 @@ class _ListCompagnie extends State<ListCompagnie> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Compagnies recommandees",
+          "Compagnies recommandées",
           style: Constante.kTitleStyle,
         ),
         centerTitle: true,
@@ -111,7 +111,7 @@ class _ListCompagnie extends State<ListCompagnie> {
           future: listCompagnie,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerVertical(10);
 
             }
             if(snapshot.hasError) {
@@ -156,7 +156,7 @@ class _ListCompagnie extends State<ListCompagnie> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerVertical(10);
           },
         ),
       ),

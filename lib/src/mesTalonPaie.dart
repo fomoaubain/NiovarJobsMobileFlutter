@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
+//import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -112,16 +112,16 @@ class _MesTalonPaie extends State<MesTalonPaie> {
           future: listTalonPaie,
           builder: (context, snapshot) {
             if(snapshot.connectionState != ConnectionState.done) {
-              return Constante.circularLoader();
+              return Constante.ShimmerSimpleVertical(10);
             }
             if(snapshot.hasError) {
               return Center(
-                  child: Text("Aucune connexion disponible", style: TextStyle(color: Colors.redAccent, fontSize: 16.0))
+                  child: Constante.layoutNotInternet(context, MaterialPageRoute(builder: (context) => MesTalonPaie()))
               );
             }
             if(initListTalonPaie.length==0) {
               return Center(
-                  child: Text("Aucun talon de paie trouvé", style: TextStyle(color: Colors.orange, fontSize: 16.0))
+                  child: Constante.layoutDataNotFound("Aucun talon de paie trouvé")
               );
             }
             if(snapshot.hasData) {
@@ -146,7 +146,7 @@ class _MesTalonPaie extends State<MesTalonPaie> {
               );
             }
             // By default, show a loading spinner.
-            return Constante.circularLoader();
+            return Constante.ShimmerSimpleVertical(10);
           },
         ),
       ),
@@ -330,9 +330,9 @@ class _MesTalonPaie extends State<MesTalonPaie> {
   }
 
   Future<Directory?> _getDownloadDirectory() async {
-    if (Platform.isAndroid) {
+   /* if (Platform.isAndroid) {
       return await DownloadsPathProvider.downloadsDirectory;
-    }
+    }*/
     // in this example we are using only Android and iOS so I can assume
     // that you are not trying it for other platforms and the if statement
     // for iOS is unnecessary
@@ -358,11 +358,15 @@ class _MesTalonPaie extends State<MesTalonPaie> {
   }
 
   Future<void> _download(Files item) async {
-    final dir = await _getDownloadDirectory();
+    var dir = "/storage/emulated/0/Download/";
+    if(Platform.isIOS){
+      var iosDir = await _getDownloadDirectory();
+      dir= iosDir!.path;
+    }
     final isPermissionStatusGranted = await _requestPermissions();
 
     if (isPermissionStatusGranted) {
-      final savePath = path.join(dir!.path, item.fileName);
+      final savePath = path.join(dir, item.fileName);
       await _startDownload(Constante.serveurAdress+item.chemin, savePath);
     } else {
       Constante.showToastError("Echec du téléchargement",fToast);
